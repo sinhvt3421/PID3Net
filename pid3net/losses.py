@@ -12,7 +12,7 @@ def negative_log_loss(min_val=3.0):
 
     def nll(y_true, y_pred):
         norm = tf.math.floor(log10(tf.reduce_max(y_true)))
-        return -y_pred.log_prob(tf.where(y_true > min_val, y_true, 0)) / tf.pow(10.0, norm)
+        return -y_pred.log_prob(tf.where(y_true > min_val, y_true, 0.0)) / tf.pow(10.0, norm)
 
     return nll
 
@@ -54,6 +54,29 @@ def total_var_3d(images):
     time = tf.cast(tf.shape(images)[1], "float32")
 
     return tf.reduce_sum(total_vars) / (time * 2 * scale) + 0.5 * tf.reduce_sum(total_vars_2) / ((time - 1) * scale)
+
+
+def total_var_3d_iso(images):
+    # ndims = len(tf.shape(images))
+    # if ndims == 4:  # [B, T, H, W]
+    pixel_dif1 = images[:, :, 1:, :] - images[:, :, :-1, :]
+    pixel_dif2 = images[:, :, :, 1:] - images[:, :, :, :-1]
+    pixel_dif3 = images[:, 1:, :, :] - images[:, :-1, :, :]
+
+    # sum_axis = [2, 3]
+
+    # pixel_dif1 = tf.pad(pixel_dif1, [[0, 0], [0, 0], [0, 1], [0, 0]])
+    # pixel_dif2 = tf.pad(pixel_dif2, [[0, 0], [0, 0], [0, 0], [0, 1]])
+
+    # total_vars = tf.reduce_sum(tf.sqrt(tf.abs(pixel_dif1) ** 2 + tf.abs(pixel_dif2) ** 2 + tf.abs(pixel_dif3) ** 2))
+    total_vars = (
+        tf.reduce_sum(tf.abs(pixel_dif1)) + tf.reduce_sum(tf.abs(pixel_dif2)) + tf.reduce_sum(tf.abs(pixel_dif3))
+    )
+
+    scale = tf.cast(tf.shape(images)[-1] ** 2, "float32")
+    time = tf.cast(tf.shape(images)[1], "float32")
+
+    return total_vars / (time * 3 * scale)
 
 
 def SSIMMetric(max_val=1.0):

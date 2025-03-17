@@ -3,14 +3,15 @@ import os
 import numpy as np
 import tensorflow as tf
 import yaml
-from pid3net.layers import *
-from pid3net.losses import *
+import time
+
 from tensorflow.keras.callbacks import *
 from tensorflow.keras.optimizers.schedules import CosineDecay, ExponentialDecay
 
 from pid3net.utils.datagenerator_ssp import DataIteratorSsp
 from pid3net.utils.general import dataset_functions
-import time
+from pid3net.layers import *
+from pid3net.losses import *
 
 
 class LearningRateTracker(tf.keras.callbacks.Callback):
