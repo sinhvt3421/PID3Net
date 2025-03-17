@@ -55,7 +55,7 @@ class PtyBase:
         return callbacks
 
     def create_loss_op(self):
-        loss = negative_log_loss(self.config["hyper"]['loss']) if self.config["hyper"]["dist"] else masked_SEloss
+        loss = negative_log_loss(self.config["hyper"]["loss"]) if self.config["hyper"]["dist"] else masked_SEloss
         return loss
 
     def train(self, epochs):
@@ -118,8 +118,8 @@ class PtyBase:
         else:
             size = self.config["hyper"]["n_time"]
 
-        for idx in range(0, len(self.data_exp)//size + 1, 1):
-            diff = self.data_exp[idx*size : (idx+1)* size]
+        for idx in range(0, len(self.data_exp) // size, 1):
+            diff = self.data_exp[idx * size : (idx + 1) * size]
 
             if (self.config["model"]["mode"] != "2d") and (self.config["model"]["mode"] != "ptychonn"):
                 diff = diff[None, ...]
@@ -139,3 +139,60 @@ class PtyBase:
             [all_predict_a, all_predict_p],
         )
 
+    def inference_o(self, overlap=4):
+        self.model.load_weights("{}/models/model_unsp.tf".format(self.config["hyper"]["save_path"])).expect_partial()
+
+        all_predict_a = []
+        all_predict_p = []
+
+        t = time.time()
+        padding = self.config["model"]["img_size"] - self.data_exp.shape[-1]
+
+        if padding > 0:
+            if self.config["model"]["mode"] == "2d" or self.config["model"]["mode"] == "ptychonn":
+                pad = ((0, 0), (padding // 2, padding // 2), (padding // 2, padding // 2))
+            else:
+                pad = ((0, 0), (0, 0), (padding // 2, padding // 2), (padding // 2, padding // 2))
+
+        if self.config["model"]["mode"] == "2d" or self.config["model"]["mode"] == "ptychonn":
+            size = self.config["hyper"]["batch_size"]
+        else:
+            size = self.config["hyper"]["n_time"]
+
+        diff = self.data_exp[0 : 0 + size]
+        if self.config["model"]["mode"] == "3d":
+            diff = diff[None, ...]
+        if padding > 0:
+            diff = np.pad(diff, pad)
+
+        _, a, p = self.model(diff)
+
+        all_predict_a.append(a[0])
+        all_predict_p.append(p[0])
+
+        for idx in range(size - overlap, len(self.data_exp) - size + 1, size - overlap):
+            diff = self.data_exp[idx : idx + size]
+            if self.config["model"]["mode"] == "3d":
+                diff = diff[None, ...]
+            if padding > 0:
+                diff = np.pad(diff, pad)
+
+            _, a, p = self.model(diff)
+
+            # all_predict_a.extend(a[size - overlap :])
+            # all_predict_p.extend(p[size - overlap :])
+
+            all_predict_a.append(a[0])
+            all_predict_p.append(p[0])
+
+        print("Total Inferences time: ", time.time() - t)
+
+        all_predict_a = np.array(all_predict_a).reshape(-1, a.shape[-1], a.shape[-1])
+        all_predict_p = np.array(all_predict_p).reshape(-1, a.shape[-1], a.shape[-1])
+        print(all_predict_p.shape)
+        np.savez_compressed(
+            "{}/object_reconstruction_{}_overlap_{}.npz".format(
+                self.config["hyper"]["save_path"], self.config["model"]["mode"], overlap
+            ),
+            [all_predict_a, all_predict_p],
+        )

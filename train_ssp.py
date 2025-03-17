@@ -45,39 +45,41 @@ def main(args):
 
     config["model"]["mode"] = args.mode
 
-    config["hyper"]["save_path"] += "_{}_r{}_{}".format(args.mode, args.n_refine, args.probe_mode)
+    config["hyper"]["save_path"] += "_{}_{}_r{}_{}".format(
+        args.mode, config["hyper"]["loss"], args.n_refine, args.probe_mode
+    )
 
     if not args.dist:
         config["hyper"]["save_path"] += "_mse"
 
     if args.mode == "3d":
-        print("Load model PtySD3Net")
-        unsp_model = PtySD3Net(config, args.pretrained)
-        unsp_model.model.summary()
+        print("Load model PID3Net")
+        ssp_model = PID3Net(config, args.pretrained)
+        ssp_model.model.summary()
     elif args.mode == "2d":
-        unsp_model = PtyBase2D(config, args.pretrained)
-        unsp_model.model.summary()
+        ssp_model = PIBaseD3Net(config, args.pretrained)
+        ssp_model.model.summary()
     elif args.mode == "autonn":
         print("Load model AutoPhaseNN")
-        unsp_model = AutoPhaseNN(config, args.pretrained)
-        unsp_model.model.summary()
+        ssp_model = AutoPhaseNN(config, args.pretrained)
+        ssp_model.model.summary()
     elif args.mode == "ptychonn":
         print("Load model PtychoNN")
-        unsp_model = PtychoNN(config, args.pretrained)
-        unsp_model.model.summary()
+        ssp_model = PtychoNN(config, args.pretrained)
+        ssp_model.model.summary()
     else:
-        print("Not available options: 3d or 2d model")
+        print("Not available options: PID3Net, AutoPhaseNN (3d) model or PIBaseD3Net, PtychoNN (2d) model, ")
 
-    unsp_model.create_dataset()
+    ssp_model.create_dataset()
 
     start = time.time()
-    hist = unsp_model.train(args.epoch)
+    hist = ssp_model.train(args.epoch)
     print("Total training time: ", time.time() - start)
 
     np.save(config["hyper"]["save_path"] + "/hist_train.npy", hist.history)
 
     print("Load trained model and inference: ")
-    unsp_model.inference()
+    ssp_model.inference()
 
 
 if __name__ == "__main__":
@@ -85,9 +87,11 @@ if __name__ == "__main__":
     parser.add_argument("dataset", type=str, help="Path to dataset configs")
 
     parser.add_argument("--mode", type=str, default="3d", help="Model type 3D or 2D (optional)")
+    
     parser.add_argument("--n_refine", type=int, default=5, help="Refinement step for enhance reconstruction")
+    
     parser.add_argument(
-        "--probe_mode", type=str, default="multi_c", help="Refine probe mode: single, single_c, multi, multi_c"
+        "--probe_mode", type=str, default="multi_c", help="Refine probe mode: single or multi mode probe function, single_c or multi_c for updating with TemporalBlock"
     )
 
     parser.add_argument("--pretrained", type=str, default="", help="Path to pretrained model (optional)")

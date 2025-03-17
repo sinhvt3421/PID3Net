@@ -1,3 +1,9 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI version](https://badge.fury.io/py/pid3net.svg)](https://badge.fury.io/py/pid3net)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/sinhvt3421/pid3net)
+[![Downloads](https://pepy.tech/badge/pid3net)](https://pepy.tech/project/pid3net)
+
+
 # Table of Contents
 
 * [Introduction](#introduction)

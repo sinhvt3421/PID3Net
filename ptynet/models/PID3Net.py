@@ -13,13 +13,13 @@ tfpl = tfp.layers
 tfd = tfp.distributions
 
 
-class PtySD3Net(PtyBase):
+class PID3Net(PtyBase):
     def __init__(self, config, pretrained=""):
         model = create_model(config)
         if pretrained:
             print("Load pretrained model from ", pretrained)
             model.load_weights(pretrained).expect_partial()
-        super(PtySD3Net, self).__init__(config=config, model=model)
+        super(PID3Net, self).__init__(config=config, model=model)
 
 
 def create_model(config):
@@ -76,11 +76,8 @@ def create_model(config):
         a = Lambda(lambda x: x, name="amplitude")(a)
         p = Lambda(lambda x: x * mask, name="phase")(p)
 
-    if cfgh["n_refine"]:
-        a = TV(0.1, "tv_a")(a)
-        p = TV(0.1, "tv_p")(p)
-
     objects = CombineComplex()(a, p)
+    objects = TV(1.0, "tv_o")(objects)
 
     # Refinement Block
     if "single" in cfgh["probe_mode"]:
@@ -104,6 +101,8 @@ def create_model(config):
         diff_intensity = Lambda(lambda x: x**2, name="diff_intensity")(diff_amp_r)
         output = [diff_intensity]
 
+    objects_r = TV(2.0, "tv_or", True)(objects_r)
+
     # Masking for output
     if cfgh["masking"]:
         ar = Lambda(lambda x: tf.math.abs(x) * mask, name="amplitude_r")(objects_r)
@@ -111,9 +110,6 @@ def create_model(config):
     else:
         ar = Lambda(lambda x: tf.math.abs(x), name="amplitude_r")(objects_r)
         pr = Lambda(lambda x: tf.math.angle(x), name="phase_r")(objects_r)
-
-    ar = TV(0.1, "tv_ar")(ar)
-    pr = TV(1.0, "tv_pr", True)(pr)
 
     output.extend([ar, pr])
 

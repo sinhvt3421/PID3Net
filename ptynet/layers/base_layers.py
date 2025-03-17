@@ -17,7 +17,7 @@ from tensorflow.keras.layers import BatchNormalization, LayerNormalization
 import tensorflow.keras as keras
 from tensorflow.keras.regularizers import l2
 from tensorflow.signal import fft2d, fftshift, ifftshift, ifft2d
-from ptynet.losses import total_var_3d
+from ptynet.losses import total_var_3d, total_var_3d_iso
 
 
 def mpi(input_tensor):
@@ -27,10 +27,12 @@ def mpi(input_tensor):
 
     return tf.tanh(input_tensor) * (math.pi)
 
+
 class Mpi(tf.keras.layers.Layer):
     """
-        A modified version of tanh with trainable parameters limit range to [-pi,pi]
+    A modified version of tanh with trainable parameters limit range to [-pi,pi]
     """
+
     def __init__(self, **kwargs):
         super(Mpi, self).__init__(**kwargs)
         self.alpha = tf.Variable(
@@ -40,13 +42,15 @@ class Mpi(tf.keras.layers.Layer):
     def call(self, inputs):
         return tf.math.tanh(inputs) * self.alpha
 
+
 def combine_complex(amp, phi):
     return tf.cast(amp, tf.complex64) * tf.exp(1j * tf.cast(phi, tf.complex64))
 
 
 class CombineComplex(tf.keras.layers.Layer):
     def call(self, amp, phi):
-        return combine_complex(amp,phi)
+        return combine_complex(amp, phi)
+
 
 class TV(tf.keras.layers.Layer):
     def __init__(self, gama, name="TV", train=False, **kwargs):
@@ -55,11 +59,11 @@ class TV(tf.keras.layers.Layer):
             gama,
             name="gama_{}".format(name),
             trainable=train,
-            constraint=lambda x: tf.clip_by_value(x, 0.1, 2.0),
+            constraint=lambda x: tf.clip_by_value(x, 0.01, 3.0),
         )
 
     def call(self, inputs):
-        self.add_loss(self.gama * total_var_3d(inputs))
+        self.add_loss(self.gama * total_var_3d_iso(inputs))
         return inputs
 
 
@@ -67,7 +71,7 @@ class TV(tf.keras.layers.Layer):
 class CNNTBLayer(tf.keras.layers.Layer):
     def __init__(self, nfilters=32, w=3, dept=1, act="swish", out="sigmoid", name="", **kwargs):
         super(CNNTBLayer, self).__init__(name=name, **kwargs)
-        self.cv = [Conv_Up_Temporal_Block(nfilters, w, padding="same", act=act, pool=False) for i in range(dept)]
+        self.cv = [Conv_Down_Temporal_Block(nfilters, w, padding="same", act=act, pool=False) for i in range(dept)]
 
         self.cv_out = Conv3D(1, (1, w, w), padding="same", activation=None)
 
@@ -86,17 +90,18 @@ class CNNTBLayer(tf.keras.layers.Layer):
 
 # Define a custom layer for probe function
 class RefineLayer(tf.keras.layers.Layer):
-    def __init__(self, mask, n_step=5, probe_mode="multi_c", **kwargs):
+    def __init__(self, mask, n_step=5, probe_mode="multi_c", mix=False, **kwargs):
         super(RefineLayer, self).__init__(**kwargs)
         self.mask = mask
 
         if n_step > 0:
-            self.alpha = tf.Variable(0.1, trainable=True, dtype="float32", name="alpha")
+            self.alpha = tf.Variable(0.2, trainable=True, dtype="float32", name="alpha")
 
         # self.probe_scale = tf.Variable(1.0, trainable=True, dtype="float32", name="probe_scale")
 
         self.n_step = n_step
         self.probe_mode = probe_mode
+        self.mix = mix
 
         if "c" in self.probe_mode:
             self.cnn_tb_a = CNNTBLayer(out="sigmoid")
@@ -146,6 +151,7 @@ class RefineLayer(tf.keras.layers.Layer):
                 objects += update
 
             elif self.probe_mode == "single_c":
+
                 invert_update = tf.math.conj(probe) * dexit / prob_tf_abs
 
                 update_a = self.cnn_tb_a(
@@ -178,7 +184,9 @@ class RefineLayer(tf.keras.layers.Layer):
                 # dexit shape [B,M,T,H,W], probe shape [M,1,H,W] -> [B,M,T,H,W] -> summing over mode probe, invert_update shape [B,T,H,W]
                 invert_update = tf.reduce_sum(tf.math.conj(probe) * dexit, 1) / prob_tf_abs
 
-                update_a = self.cnn_tb_a(tf.math.abs(invert_update) * self.mask if self.mask is not None else tf.math.abs(invert_update))
+                update_a = self.cnn_tb_a(
+                    tf.math.abs(invert_update) * self.mask if self.mask is not None else tf.math.abs(invert_update)
+                )
 
                 update_p = self.cnn_tb_p(
                     tf.math.angle(invert_update) * self.mask if self.mask is not None else tf.math.angle(invert_update)
@@ -251,7 +259,7 @@ class Conv_Down_Temporal_Block(keras.layers.Layer):
 # decoder layer
 class Conv_Up_Temporal_Block(keras.layers.Layer):
     def __init__(self, nfilters, w=3, padding="same", trans=True, act="swish", name="", **kwargs):
-        super(Conv_Down_Temporal_Block, self).__init__(name=name, **kwargs)
+        super(Conv_Up_Temporal_Block, self).__init__(name=name, **kwargs)
 
         self.cv = Conv3D(nfilters, (1, 1, 1), padding=padding, activation=act, kernel_regularizer=l2(1e-5))
 
@@ -330,4 +338,3 @@ class Conv_Up_block(keras.layers.Layer):
 
         x = self.tcv(x)
         return x
-

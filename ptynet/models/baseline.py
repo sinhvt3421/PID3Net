@@ -5,6 +5,7 @@ from ptynet.layers import *
 from tensorflow.keras.callbacks import *
 from ptynet.models import PtyBase
 from ptynet.losses import total_var_3d, total_var
+from ptynet.layers import CNNEncoder, CNNDecoder
 
 import numpy as np
 import tensorflow_probability as tfp
@@ -13,13 +14,13 @@ tfpl = tfp.layers
 tfd = tfp.distributions
 
 
-class PtyBase2D(PtyBase):
+class PIBaseD3Net(PtyBase):
     def __init__(self, config, pretrained=""):
         model = create_model(config)
         if pretrained:
             print("Load pretrained model from ", pretrained)
             model.load_weights(pretrained).expect_partial()
-        super(PtyBase2D, self).__init__(config=config, model=model)
+        super(PIBaseD3Net, self).__init__(config=config, model=model)
 
 
 def create_model(config):
