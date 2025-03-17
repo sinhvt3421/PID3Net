@@ -9,7 +9,7 @@ model:
   img_size: 384
 hyper:
   batch_size: 4
-  loss: 3.0
+  loss: 2.0
   masking: "../../processed_data/PR/Probe/mask_probe_378.npy"
   probe: "../../processed_data/PR/Probe/probe_function_378.npy"
   probe_mode: "multi_c"
