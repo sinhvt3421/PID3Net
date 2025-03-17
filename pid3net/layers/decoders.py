@@ -2,7 +2,8 @@ import tensorflow as tf
 import tensorflow.keras as keras
 import tensorflow.keras.backend as K
 from tensorflow.keras.layers import Conv2D, Lambda, Conv3D, MultiHeadAttention, LayerNormalization, Dense, Flatten
-from .base_layers import Conv_Up_Temporal_Block, Conv_Up_block
+
+from pid3net.layers.base_layers import Conv_Up_Temporal_Block, Conv_Up_block
 
 
 class TBDecoder(keras.layers.Layer):

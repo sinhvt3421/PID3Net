@@ -15,8 +15,8 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers.schedules import CosineDecay
 from tensorflow.keras.callbacks import *
 
-from ptynet.models import *
-from ptynet.losses import *
+from pid3net.models import *
+from pid3net.losses import *
 import random
 import argparse
 import time

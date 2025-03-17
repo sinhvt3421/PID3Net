@@ -1,14 +1,17 @@
 import tensorflow as tf
+import numpy as np
+
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input, Lambda, Conv3D, Conv2D, UpSampling2D, MaxPool2D
-from ptynet.layers import *
 from tensorflow.keras.callbacks import *
-from ptynet.models import PtyBase
-from ptynet.losses import total_var_3d, total_var
 from tensorflow.signal import fft2d, fftshift, ifftshift, ifft2d
+
+
+from pid3net.models import PtyBase
+from pid3net.layers import *
+from pid3net.losses import total_var_3d, total_var
 import math
 
-import numpy as np
 
 
 class PtychoNN(PtyBase):

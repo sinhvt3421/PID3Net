@@ -1,6 +1,8 @@
 # Keras modules
 from tensorflow.keras.layers import Conv3D, MaxPool3D, UpSampling3D, ZeroPadding3D
 from tensorflow.keras.layers import LeakyReLU, BatchNormalization, Activation
+from tensorflow.signal import fft2d, fftshift, ifftshift, ifft2d
+
 import tensorflow as tf
 from tensorflow.keras import Input
 from tensorflow.keras import Model
@@ -8,10 +10,9 @@ from tensorflow.keras.layers import Lambda
 from tensorflow.keras.activations import sigmoid, tanh, relu
 from tensorflow.keras.callbacks import TensorBoard
 import tensorflow.keras.backend as K
-import math
-from ptynet.layers import *
-from tensorflow.signal import fft2d, fftshift, ifftshift, ifft2d
-from ptynet.models import PtyBase
+
+from pid3net.layers import *
+from pid3net.models import PtyBase
 
 import numpy as np
 
@@ -25,7 +26,8 @@ class AutoPhaseNN(PtyBase):
         super(AutoPhaseNN, self).__init__(config=config, model=model)
 
 
-#All the code from https://github.com/YudongYao/AutoPhaseNN/blob/main/TF2/keras_helper.py
+# All the code from https://github.com/YudongYao/AutoPhaseNN/blob/main/TF2/keras_helper.py
+
 
 # encoder layers
 def Conv_Pool_block(
@@ -94,7 +96,9 @@ def Conv_Upfirst_block_mlast(x0, nfilters, w1=3, w2=3, w3=3, psize=16, padding="
 
     return x0
 
+
 ###
+
 
 def get_mask(input):
 
@@ -202,10 +206,10 @@ def create_model(config):
     decoded2 = Mpi()(decoded2)
     decoded2 = Lambda(lambda x: tf.squeeze(x, -1))(decoded2)
 
-    ### 
-    
-    ### Adding forward FFT for self-supervised learning 
-    
+    ###
+
+    ### Adding forward FFT for self-supervised learning
+
     # Cropping objects, diffraction to match probs shape
     padding = input_img.shape[-2] - probs.shape[-1]
     if padding > 0:

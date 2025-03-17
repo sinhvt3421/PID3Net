@@ -1,13 +1,14 @@
 import tensorflow as tf
+import numpy as np
+
+import tensorflow_probability as tfp
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input, Lambda, Conv3D, Conv2D, Concatenate
 from ptynet.layers import *
 from tensorflow.keras.callbacks import *
-from ptynet.models import PtyBase
-from ptynet.losses import total_var_3d, total_var
 
-import numpy as np
-import tensorflow_probability as tfp
+from pid3net.models import PtyBase
+from pid3net.losses import total_var_3d, total_var
 
 tfpl = tfp.layers
 tfd = tfp.distributions

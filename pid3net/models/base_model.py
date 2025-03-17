@@ -3,12 +3,13 @@ import os
 import numpy as np
 import tensorflow as tf
 import yaml
-from ptynet.layers import *
-from ptynet.losses import *
+from pid3net.layers import *
+from pid3net.losses import *
 from tensorflow.keras.callbacks import *
 from tensorflow.keras.optimizers.schedules import CosineDecay, ExponentialDecay
-from utils.datagenerator_ssp import DataIteratorSsp
-from utils.general import dataset_functions
+
+from pid3net.utils.datagenerator_ssp import DataIteratorSsp
+from pid3net.utils.general import dataset_functions
 import time
 
 

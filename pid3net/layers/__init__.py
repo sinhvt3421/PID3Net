@@ -1,6 +1,6 @@
-from ptynet.layers.base_layers import *
-from ptynet.layers.encoders import *
-from ptynet.layers.decoders import *
+from pid3net.layers.base_layers import *
+from pid3net.layers.encoders import *
+from pid3net.layers.decoders import *
 
 _CUSTOM_OBJECTS = globals()
 

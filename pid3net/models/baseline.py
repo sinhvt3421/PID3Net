@@ -1,11 +1,12 @@
 import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input, Lambda, Conv3D, Conv2D, Concatenate
-from ptynet.layers import *
+from pid3net.layers import *
 from tensorflow.keras.callbacks import *
-from ptynet.models import PtyBase
-from ptynet.losses import total_var_3d, total_var
-from ptynet.layers import CNNEncoder, CNNDecoder
+
+from pid3net.models import PtyBase
+from pid3net.losses import total_var_3d, total_var
+from pid3net.layers import CNNEncoder, CNNDecoder
 
 import numpy as np
 import tensorflow_probability as tfp

@@ -17,7 +17,9 @@ from tensorflow.keras.layers import BatchNormalization, LayerNormalization
 import tensorflow.keras as keras
 from tensorflow.keras.regularizers import l2
 from tensorflow.signal import fft2d, fftshift, ifftshift, ifft2d
-from ptynet.losses import total_var_3d, total_var_3d_iso
+
+
+from pid3net.losses import total_var_3d, total_var_3d_iso
 
 
 def mpi(input_tensor):
