@@ -9,8 +9,8 @@
 * [Introduction](#introduction)
 * [PID3Net Framework](#pid3net-framework)
 * [Installation](#installation)
-<!-- * [Usage](#usage)
 * [Datasets](#datasets)
+<!-- * [Usage](#usage)
 * [References](#references) -->
 
 <a name="introduction"></a>
@@ -35,11 +35,17 @@ year = {2025}
 }
 ```
 
+We developed a `Physics-Informed Deep learning Network for Dynamic Diffraction imaging (PID3Net)` that takes advantage of a neural network to reconstruct the phase image of objects in Coherent x-ray diffraction imaging (CXDI) experiment.
+
+ PID3Net leverages established physical principles and utilizes experimental conditions to guide the network’s optimization. By introducing physics-based priors via the measurement-informed refinement block (RB) and the loss functions, PID3Net ensure that our reconstructions remain consistent with the underlying diffraction physics rather than relying solely on learned statistical patterns.
+
+PID3Net is a self-supervised learning approach, where the network learns directly from the measured diffraction data without relying on external reference images or human-provided labels.
+
 <a name="pid3net-framework"></a>
 
 # PID3Net framework
 
-Figure 1 shows the overall schematic of the model
+Figure 1 shows the overall schematic of the model.
 
 ![Model architecture](resources/model_semantic.jpg)
 
@@ -71,3 +77,13 @@ git clone https://github.com/sinhvt3421/PID3Net
 cd PID3Net
 python -m pip install -e .
 ```
+
+<a name="dataset"></a>
+
+# Datasets
+
+## Experiments
+
+The settings for experiments specific is placed in the folder [configs](configs)
+
+We provide an implementation for the Moving Ta test chart, gold nanoparticles AuNP [1] experiments.
