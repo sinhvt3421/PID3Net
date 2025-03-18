@@ -10,8 +10,9 @@
 * [PID3Net Framework](#pid3net-framework)
 * [Installation](#installation)
 * [Datasets](#datasets)
-<!-- * [Usage](#usage)
-* [References](#references) -->
+* [References](#references)
+<!-- * [Usage](#usage) -->
+
 
 <a name="introduction"></a>
 
@@ -86,4 +87,13 @@ python -m pip install -e .
 
 The settings for experiments specific is placed in the folder [configs](configs)
 
-We provide an implementation for the Moving Ta test chart, gold nanoparticles AuNP [1] experiments.
+We provide an implementation for the Moving Ta test chart [1], gold nanoparticles AuNP [2] experiments.
+
+<a name="reference"></a>
+
+# References
+
+[1] Tien-Sinh Vu, T., Takazawa & Chi, D. H. Diffraction intensity for phase retrieval of Ta test chart and AuNP dynamics motion using single-shot coherrent X-ray diffraction imaging. https://doi.org/10.5281/zenodo.12144981 (2024)
+
+[2] Takazawa, S. et al. Coupling x-ray photon correlation spectroscopy and dynamic coherent x-ray diffraction imaging: Particle motion analysis from nano-to-micrometer scale. Phys. Rev. Res. 5, L042019 (2023) https://doi.org/10.1103/PhysRevResearch.5.L042019.
+
