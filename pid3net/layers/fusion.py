@@ -77,9 +77,36 @@ class PriorPhaseLoss(tf.keras.layers.Layer):
 
 
 class TimeDecayFusion(tf.keras.layers.Layer):
+    """Fuse decoder amplitude/phase output with an initial prior, gated by time step.
+
+    A learned per-pixel blending weight ``w`` combines the current decoder
+    estimate with a fixed initial prior.  At the first time step (``t == 0``)
+    the weight is clamped to 0.1 so the network stays close to its own
+    estimate rather than collapsing to the prior:
+
+    - ``w → 0``: trust the current decoder estimate ``ap``.
+    - ``w → 1``: trust the initial prior ``init_ap``.
+
+    Args:
+        filters: Number of intermediate Conv3D feature maps. Default 8.
+        kernel_size: Spatial kernel size for all Conv3D layers. Default 3.
+        act: Activation for intermediate layers. Default ``"swish"``.
+        mode: Decay-mode tag (reserved for future variants). Default ``"exp"``.
+        **kwargs: Passed to ``tf.keras.layers.Layer``.
+
+    Call signature:
+        ``layer(ap, init_ap, t)``
+
+        ap      : current decoder phase or amplitude  [B, T, H, W]
+        init_ap : initial prior (tiled over batch/time) [1, 1, H, W]
+        t       : current iteration index (scalar float; 0 = first step)
+
+    Returns:
+        Fused tensor of shape [B, T, H, W].
+    """
+
     def __init__(
         self,
-        alpha: float = 0.1,
         filters: int = 8,
         kernel_size: int = 3,
         act: str = "swish",
@@ -87,7 +114,6 @@ class TimeDecayFusion(tf.keras.layers.Layer):
         **kwargs: object,
     ) -> None:
         super().__init__(**kwargs)
-        self.alpha = tf.Variable(alpha, trainable=True, dtype=tf.float32)
         self.mode = mode
         self.convs = tf.keras.Sequential(
             [
