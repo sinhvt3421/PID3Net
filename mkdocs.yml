@@ -65,6 +65,9 @@ plugins:
         python:
           paths: [.]
           options:
+            # Pure static analysis — never fall back to dynamic import,
+            # because the CI docs image does not install TensorFlow.
+            allow_inspection: false
             show_source: true
             show_root_heading: true
             show_root_full_path: false

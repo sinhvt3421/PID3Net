@@ -13,14 +13,14 @@ Model classes, the base class, and the registry used by `pid3net-train`.
 
 ## Default model
 
-::: pid3net.models.pid3net.PID3Net
+::: pid3net.models.PID3Net
     options:
       heading_level: 3
       show_root_heading: true
 
 ## 2D ablation
 
-::: pid3net.models.baseline.PIBaseD3Net
+::: pid3net.models.PIBaseD3Net
     options:
       heading_level: 3
       show_root_heading: true
