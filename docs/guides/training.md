@@ -98,6 +98,7 @@ trained_models/<auto-suffixed-name>/
 ├── models/                       # Keras .tf checkpoints
 ├── hist_train.npy                # per-epoch loss history (dict)
 ├── object_reconstruction.npz     # final amplitude + phase stack
+├── monitor/                      # sample phase, amp reconstruction at each epoch
 ├── pid3net.py                    # source snapshot — model
 ├── base_model.py                 # source snapshot — training loop
 ├── physics_layers.py             # source snapshot — RefineLayer
