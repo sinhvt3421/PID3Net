@@ -1,7 +1,7 @@
 """Decoder backbones built from temporal or 2D conv blocks.
 
-- :class:`TBDecoder` — temporal block decoder for 3D models.
-- :class:`CNNDecoder` — 2D decoder for non-temporal models.
+- `TBDecoder` — temporal block decoder for 3D models.
+- `CNNDecoder` — 2D decoder for non-temporal models.
 
 Each decoder mirrors its encoder: ``n_layers`` upsampling blocks (channels
 shrinking as ``filters * 2**(n_layers-1-i)``) plus a final 1×k×k projection
@@ -20,7 +20,7 @@ from pid3net.layers.conv_blocks import Conv_Up_Temporal_Block, Conv_Up_block
 class TBDecoder(keras.layers.Layer):
     """Temporal-block decoder for 3D models.
 
-    Stacks ``n_layers - 1`` :class:`Conv_Up_Temporal_Block` layers with
+    Stacks ``n_layers - 1`` `Conv_Up_Temporal_Block` layers with
     shrinking channel counts, one final ``Conv_Up_Temporal_Block`` at
     ``filters`` channels, and a 1×w×w projection.
 
@@ -54,7 +54,7 @@ class TBDecoder(keras.layers.Layer):
 class CNNDecoder(keras.layers.Layer):
     """2D-conv decoder for non-temporal models.
 
-    2D counterpart of :class:`TBDecoder`.  Args match.
+    2D counterpart of `TBDecoder`.  Args match.
     """
 
     def __init__(self, n_layers=4, filters=8, w=3, activation="swish", name="", **kwargs):

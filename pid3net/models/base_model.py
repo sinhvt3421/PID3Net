@@ -32,7 +32,7 @@ class LearningRateTracker(tf.keras.callbacks.Callback):
 class PriorLossDecay(tf.keras.callbacks.Callback):
     """Cosine-anneal the prior loss weight from initial to final over training.
 
-    Works with :class:`~pid3net.layers.fusion.PriorPhaseLoss` layers whose
+    Works with `PriorPhaseLoss` layers whose
     ``weight`` variable controls the MSE loss strength between the
     reconstruction and the ODE phase/amplitude prior.
 

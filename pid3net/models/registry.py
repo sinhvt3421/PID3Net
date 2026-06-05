@@ -1,15 +1,15 @@
 """Central registry of model variants.
 
-Each entry maps a short config key (e.g. ``"3d3"``) to a :class:`ModelSpec`
+Each entry maps a short config key (e.g. ``"3d3"``) to a `ModelSpec`
 describing the model class and a human-readable name.  The model class itself
 declares its ``is_temporal`` flag as a class attribute (read by
-:class:`~pid3net.models.base_model.PtyBase`).
+`PtyBase`).
 
 Adding a new model variant requires only:
 
 1. Implement a new ``PtyBase`` subclass in ``pid3net/models/``.  Set
    ``is_temporal = True`` (3D) or ``False`` (2D) as a class attribute.
-2. Register it here with :func:`register_model` (or extend ``MODEL_REGISTRY``).
+2. Register it here with `register_model` (or extend ``MODEL_REGISTRY``).
 3. Re-export the class from ``pid3net/models/__init__.py``.
 
 No edits to ``base_model.py`` or ``pid3net/train.py`` are required.

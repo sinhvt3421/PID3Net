@@ -435,7 +435,7 @@ class RefineLayer(tf.keras.layers.Layer):
     def compute_output_intensity(self, objects, probe, fftconst):
         """Compute final diffraction amplitude from the refined object.
 
-        Delegates to the module-level :func:`ptychography_forward` function so
+        Delegates to the module-level `ptychography_forward` function so
         the same logic can be reused outside of the refinement loop.
         """
         return ptychography_forward(objects, probe, fftconst, self.probe_mode, self.refractive)

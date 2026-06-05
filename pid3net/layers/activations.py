@@ -6,12 +6,12 @@ physically meaningful range while the bound itself is learned during training.
 
 Three variants exist for three different output domains:
 
-- :class:`AmpConstraint`: hard-clipped amplitude (used for refractive-mode
+- `AmpConstraint`: hard-clipped amplitude (used for refractive-mode
   CNN amplitude updates where the value must stay in a small bounded range
   but is not naturally probabilistic).
-- :class:`Mpi`: ``tanh(x) * alpha`` with ``alpha`` clipped to ``[-π, π]`` — the
+- `Mpi`: ``tanh(x) * alpha`` with ``alpha`` clipped to ``[-π, π]`` — the
   natural bound for **polar-mode** phase, which physically wraps modulo ``2π``.
-- :class:`PhaseConstraint`: ``tanh(x) * alpha`` with ``alpha`` clipped to
+- `PhaseConstraint`: ``tanh(x) * alpha`` with ``alpha`` clipped to
   ``[-10, 10]`` — the wider bound used for **refractive-mode** phase, where the
   phase value can grow beyond ``π`` (no wrapping), so the constraint exists
   only to stabilise training, not to enforce a physical limit.
@@ -31,7 +31,7 @@ class AmpConstraint(tf.keras.layers.Layer):
     """Hard clip to ``[-0.5, 5.0]`` for amplitude in refractive-mode CNN updates.
 
     No trainable parameter — the bounds are fixed.  Used inside
-    :class:`~pid3net.layers.physics_layers.CNNTBLayer` when ``out="const"``.
+    `CNNTBLayer` when ``out="const"``.
 
     Call:
         ``layer(x) -> tf.clip_by_value(x, -0.5, 5.0)``

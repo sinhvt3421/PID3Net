@@ -213,7 +213,7 @@ def apply_masking_and_ptycho_fusion(a, p, mask, object_init, time_input, cfgh):
 def apply_prior_fusion(a, p, prior_amp_input, prior_phase_input, cfgh):
     """Fuse decoder amplitude and phase outputs with ODE-generated per-step priors.
 
-    When ``use_prior_phase=True``, applies :class:`~pid3net.layers.fusion.PriorPhaseFusion`
+    When ``use_prior_phase=True``, applies `PriorPhaseFusion`
     independently to both branches:
 
     - **Amplitude branch**: blends ``a`` with ``prior_amp`` (channel 0 of prior file).
@@ -243,7 +243,7 @@ def apply_prior_fusion(a, p, prior_amp_input, prior_phase_input, cfgh):
 def crop_prior_to_probe_size(prior_input, diff, probs):
     """Center-crop a prior tensor from img_size down to probe_size.
 
-    After :func:`crop_to_probe_size` the amplitude/phase tensors are at probe_size
+    After `crop_to_probe_size` the amplitude/phase tensors are at probe_size
     ``[H_p, W_p]``.  The prior was built at img_size, so it must be cropped by the
     same amount before it can be used for loss computation or fusion.
 
@@ -334,9 +334,9 @@ def build_output_head(
 ):
     """Build the output layers: diffraction intensity, refined amplitude, refined phase.
 
-    When ``use_prior_phase=True``, a :class:`~pid3net.layers.fusion.PriorPhaseLoss`
+    When ``use_prior_phase=True``, a `PriorPhaseLoss`
     layer adds a weighted MSE loss between ``phase_r`` and the ODE prior.  The
-    weight is cosine-annealed by :class:`~pid3net.models.base_model.PriorLossDecay`.
+    weight is cosine-annealed by `PriorLossDecay`.
 
     Args:
         diff_amp_r: Refined diffraction amplitude from RefineLayer ``[B, T, H, W]``.
@@ -410,11 +410,11 @@ def create_model(config):
 
     Config keys (``hyper`` section):
         use_prior_phase (bool): If True, enables prior-phase guidance via
-            :class:`~pid3net.layers.fusion.PriorPhaseFusion` (pre-refinement
+            `PriorPhaseFusion` (pre-refinement
             blending with ODE prior) and
-            :class:`~pid3net.layers.fusion.PriorPhaseLoss` (annealing MSE loss
+            `PriorPhaseLoss` (annealing MSE loss
             on refined phase vs prior, weight decayed by
-            :class:`~pid3net.models.base_model.PriorLossDecay`).  Default False.
+            `PriorLossDecay`).  Default False.
         use_prior_amp (bool): If True (and use_prior_phase is also True), additionally
             fuses the ODE amplitude prior with the amplitude decoder branch and
             adds an annealing amplitude prior loss.  Disabled by default because

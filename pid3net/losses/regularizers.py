@@ -1,12 +1,12 @@
 """Total-variation regularisers on the reconstructed object volume.
 
 Three flavours, all applied to a temporal stack ``[B, T, H, W]``:
-- :func:`total_var` — 2D anisotropic TV per frame (no temporal term).
-- :func:`total_var_3d` — 3D anisotropic TV with separate spatial and
+- `total_var` — 2D anisotropic TV per frame (no temporal term).
+- `total_var_3d` — 3D anisotropic TV with separate spatial and
   temporal terms.
-- :func:`total_var_3d_iso` — 3D mixed TV: isotropic spatial gradient
+- `total_var_3d_iso` — 3D mixed TV: isotropic spatial gradient
   magnitude + L1 temporal gradient.  Default regulariser used by the
-  :class:`~pid3net.layers.physics_layers.TV` layer.
+  `TV` layer.
 """
 
 import tensorflow as tf

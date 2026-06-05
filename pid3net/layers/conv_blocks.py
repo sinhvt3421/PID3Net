@@ -81,7 +81,7 @@ class Conv_Down_Temporal_Block(keras.layers.Layer):
 class Conv_Up_Temporal_Block(keras.layers.Layer):
     """Multi-scale temporal conv block with 2× spatial upsampling.
 
-    Mirror of :class:`Conv_Down_Temporal_Block` but always upsamples spatially
+    Mirror of `Conv_Down_Temporal_Block` but always upsamples spatially
     by 2 (via ``Conv3DTranspose`` if ``trans=True``, else ``UpSampling3D``).
 
     Args:
