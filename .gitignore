@@ -29,3 +29,4 @@ trained_models/
 *.npz
 *.npy
 !resources/*.npy
+.DS_Store

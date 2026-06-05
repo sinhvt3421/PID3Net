@@ -1,39 +1,42 @@
 name: Deploy docs
-
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write  # required for mkdocs gh-deploy
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: docs
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # full history so mkdocs/git-revision plugins (future) work
-
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
+      - run: pip install ".[docs]"
+      - run: mkdocs build --strict
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
 
-      - name: Install docs dependencies
-        run: |
-          python -m pip install --upgrade pip
-          # Docs-only install — does not pull TensorFlow.
-          # mkdocstrings parses sources via AST, no runtime import needed.
-          pip install ".[docs]"
-
-      - name: Strict build (catch broken links / warnings)
-        run: mkdocs build --strict
-
-      - name: Deploy to gh-pages
-        run: mkdocs gh-deploy --force --clean
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
