@@ -101,13 +101,12 @@ Selected via `--update_method pie | raar`.
 
 | Mode | Probe shape | Constraint application | Object update |
 |---|---|---|---|
-| `single` | `[1, H, W]` | per-pixel modulus replacement | analytic gradient only |
 | `single_c` | `[1, H, W]` | per-pixel modulus replacement | analytic gradient + CNN nudge |
-| `multi` | `[M, H, W]` | summed intensity per-pixel | analytic gradient only |
 | `multi_c` | `[M, H, W]` | summed intensity per-pixel | analytic gradient + CNN nudge (default) |
 
-The `_c` (CNN) variants are recommended; the analytic-only modes
-exist as physics-only baselines.
+Both modes route the analytic gradient through a learned `CNNTBLayer`
+correction. The physics-only (`single` / `multi`, without the `_c`
+suffix) variants from v1.0.0 are not part of the v2 public surface.
 
 ## Further reading
 

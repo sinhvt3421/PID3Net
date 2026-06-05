@@ -11,7 +11,7 @@ pid3net-train <dataset_config> [options]
 | `dataset` | str | *required* | Path to dataset YAML config. |
 | `--model` | str | `3d3` | Architecture: `3d3` (PID3Net) or `2d` (PIBaseD3Net ablation). |
 | `--n_refine` | int | `5` | Number of refinement iterations. |
-| `--probe_mode` | str | `multi_c` | One of `single`, `single_c`, `multi`, `multi_c`. |
+| `--probe_mode` | str | `multi_c` | One of `single_c`, `multi_c`. |
 | `--rec_mode` | str | `refractive` | `polar` or `refractive`. |
 | `--update_method` | str | `pie` | `pie` (ePIE) or `raar`. |
 | `--pretrained` | str | `""` | Path to a `.tf` checkpoint to warm-start from. |

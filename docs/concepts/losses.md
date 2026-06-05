@@ -36,11 +36,8 @@ and the loss becomes the negative log-likelihood:
 $$L \;=\; -\sum_q m(q) \cdot \log p\big(I_\text{meas}(q)\,\big|\,\lambda = I_\text{pred}(q)\big)$$
 
 with the mask thresholding low-intensity pixels (where the Poisson
-NLL is numerically unstable or noise-dominated). The two variants
-differ only in how the mask is applied:
+NLL is numerically unstable or noise-dominated):
 
-- `negative_log_loss_t(min_val=3.0)` — zero-out the *measurement* below
-  threshold, then evaluate `-log_prob` over all pixels.
 - `negative_log_loss(min_val=1.0)` — keep all measurements, but
   *weight* the per-pixel `-log_prob` by the mask before summing over
   spatial axes.

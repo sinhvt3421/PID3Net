@@ -3,24 +3,23 @@
 The `probe_mode` flag controls how the illumination probe is treated by
 the forward model and the refinement update.
 
-## The four modes
+## The two modes
 
 | Mode | Probe shape | Forward model | Object update | When to use |
 |---|---|---|---|---|
-| `single` | `[1, H, W]` | `Ψ = F{P · O}` | Analytic gradient only. | Smallest / cheapest. Use when the probe is single-mode and you don't need a learned correction. |
 | `single_c` | `[1, H, W]` | `Ψ = F{P · O}` | Analytic gradient **+ CNN nudge**. | Single-mode probe with learned regularisation. |
-| `multi` | `[M, H, W]` | `I_pred = ∑ₘ \|F{Pₘ · O}\|²` | Analytic gradient summed over modes. | Multi-mode probe, physics-only update. |
 | `multi_c` | `[M, H, W]` | `I_pred = ∑ₘ \|F{Pₘ · O}\|²` | Analytic + CNN nudge. **Default.** | Multi-mode probe with learned regularisation. |
+
+The CNN update (the `_c` suffix) is mandatory in v2 — both modes feed
+the analytic gradient `conj(P) · dψ` through `CNNTBLayer` before
+applying it to the object.
 
 ## How to pick
 
-- **Single-mode source** (well-focused, coherent X-ray): start with
+- **Single-mode source** (well-focused, coherent X-ray): use
   `single_c`.
-- **Multi-mode source** (multi-mode FEL, partial coherence): start with
-  `multi_c`.
-- **Physics-only baseline / ablation**: use the corresponding
-  non-`_c` variant. Useful for measuring how much the CNN actually
-  contributes.
+- **Multi-mode source** (multi-mode FEL, partial coherence): use
+  `multi_c` (default).
 
 ## How the multi-mode reduction works
 
@@ -45,9 +44,7 @@ The probe-mode choice influences:
 - Whether the `CNNTBLayer` correction is instantiated.
 
 So switching `multi_c` → `single_c` requires a re-train (CNN weights
-don't transfer cleanly across mode dimensionality). Switching
-`multi_c` → `multi` keeps the same probe file but discards the CNN
-heads.
+don't transfer cleanly across mode dimensionality).
 
 ## See also
 

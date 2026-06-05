@@ -160,7 +160,7 @@ def build_parser():
     )
     parser.add_argument("--n_refine", type=int, default=5, help="Refinement steps for reconstruction")
     parser.add_argument(
-        "--probe_mode", type=str, default="multi_c", help="Probe mode: single, single_c, multi, multi_c"
+        "--probe_mode", type=str, default="multi_c", help="Probe mode: single_c, multi_c"
     )
     parser.add_argument("--rec_mode", type=str, default="refractive", help="Reconstruction mode polar or refractive")
     parser.add_argument(

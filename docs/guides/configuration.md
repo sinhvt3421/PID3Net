@@ -30,7 +30,7 @@ edit. This page is the canonical reference.
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `probe` | str | required | Path to probe `.npy`. Complex64. Shape `[H, W]` (single) or `[M, H, W]` (multi). |
-| `probe_mode` | str | `"multi_c"` | One of `single`, `single_c`, `multi`, `multi_c`. See [Probe modes](probe-modes.md). |
+| `probe_mode` | str | `"multi_c"` | One of `single_c`, `multi_c`. See [Probe modes](probe-modes.md). |
 | `probe_norm` | float / bool | `false` | Amplitude scaling on the probe (typically exposure-ratio). |
 | `masking` | str / bool | `false` | Path to spatial mask `.npy`, or `false`. |
 | `rec_mode` | str | `"refractive"` | `polar` (`A·exp(jφ)`) or `refractive` (`φ + j·A`). |

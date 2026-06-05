@@ -5,12 +5,12 @@ physics-informed iterative refinement block**. Three baseline variants
 trade dimensions or refinement for simpler comparisons.
 
 ```
-      　┌──────────┐    ┌──────────┐
-diff ─▶　│ TBEncoder│ ─▶│ TBDecoder│─┐
-        └──────────┘    └──────────┘ │
-                                             ▼
+         ┌──────────┐    ┌──────────┐
+diff ──▶ │ TBEncoder│ ──▶│ TBDecoder│─────────┐
+         └──────────┘    └──────────┘         │
+                                              ▼
                                     ┌─────────────────┐
-   optional init/prior ────────▶ 　　│PriorFusion 　　│
+   optional init/prior ────────▶    │  PriorFusion    │
                                     └─────────────────┘
                                              │
                                              ▼
@@ -103,8 +103,8 @@ Three outputs:
 
 | Key | Class | Dimensions | Refinement | Probe modes | Notes |
 |---|---|---|---|---|---|
-| `3d3` | `PID3Net` | 3D temporal | ✅ | all four | Default, recommended. |
-| `2d` | `PIBaseD3Net` | 2D spatial | ✅ | all four | 2D ablation — drops the temporal axis. Useful for measuring the contribution of T. |
+| `3d3` | `PID3Net` | 3D temporal | ✅ | `single_c`, `multi_c` | Default, recommended. |
+| `2d` | `PIBaseD3Net` | 2D spatial | ✅ | `single_c`, `multi_c` | 2D ablation — drops the temporal axis. Useful for measuring the contribution of T. |
 
 Both variants are registered in `pid3net.models.MODEL_REGISTRY`; switch
 by passing `--model 2d` on the CLI.

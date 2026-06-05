@@ -3,7 +3,7 @@ site_description: >-
   Physics-Informed Deep learning Network for Dynamic Diffraction imaging —
   end-to-end documentation, API reference, and design notes.
 site_author: Vu Tien-Sinh
-site_url: https://sinhvt3421.github.io/pid3net/
+site_url: https://sinhvt3421.github.io/PID3Net/
 repo_name: sinhvt3421/PID3Net
 repo_url: https://github.com/sinhvt3421/PID3Net
 edit_uri: edit/main/docs/
@@ -85,6 +85,12 @@ plugins:
             docstring_options:
               warn_missing_types: false
 
+extra_javascript:
+  # Custom MathJax 3 loader.  We pin both files so no script from
+  # polyfill.io (sold to a malicious operator in 2024) is ever fetched.
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
 markdown_extensions:
   - admonition
   - attr_list
@@ -117,9 +123,6 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
-
-extra_javascript:
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
 nav:
   - Home: index.md

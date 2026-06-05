@@ -28,10 +28,23 @@ copy of this software and associated documentation files...
 If you use PID3Net in academic work, please cite:
 
 ```bibtex
-@software{vu2025pid3net,
+@article{Vu2025,
+author = {Vu, Tien-Sinh, et al.,},
+doi = {10.1038/s41524-025-01549-x},
+issn = {2057-3960},
+journal = {npj Computational Materials},
+number = {1},
+pages = {66},
+title = {{PID3Net: a deep learning approach for single-shot coherent X-ray diffraction imaging of dynamic phenomena}},
+url = {https://doi.org/10.1038/s41524-025-01549-x},
+volume = {11},
+year = {2025}
+}
+
+@software{vu2026pid3net,
   author = {Vu, Tien-Sinh and contributors},
   title  = {PID3Net: Physics-Informed Deep learning Network for Dynamic Diffraction imaging},
-  year   = {2025},
+  year   = {2026},
   url    = {https://github.com/sinhvt3421/PID3Net},
   version = {2.0.0},
 }
@@ -40,22 +53,10 @@ If you use PID3Net in academic work, please cite:
 A companion publication is in preparation; this entry will be updated
 with the journal reference upon publication.
 
-## Acknowledgements
-
-The model builds on ideas from:
-
-- **ePIE / RAAR** (Maiden & Rodenburg 2009; Luke 2005) — the
-  iterative-projection algorithms the refinement block mirrors.
-- **Maximum-likelihood ptychography** (Thibault & Guizar-Sicairos 2012) —
-  the Poisson-MLE formulation underlying the optional Poisson projection.
-- Earlier deep-learning ptychography work — notably AutoPhaseNN (Yao
-  *et al.*) and PtychoNN (Cherukara *et al.*) — for the
-  encoder–decoder skeleton that PID3Net extends with a 3D temporal
-  axis and a learned refinement block.
 
 ## Project links
 
 - **Source**: <https://github.com/sinhvt3421/PID3Net>
 - **Issue tracker**: <https://github.com/sinhvt3421/PID3Net/issues>
-- **Documentation**: <https://sinhvt3421.github.io/pid3net/>
+- **Documentation**: <https://sinhvt3421.github.io/PID3Net/>
 - **Changelog**: [changelog.md](changelog.md)
