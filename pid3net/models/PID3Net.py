@@ -38,7 +38,7 @@ class PID3Net(PtyBase):
         pretrained: Path to pretrained weights file. Empty string to skip.
     """
 
-    def __init__(self, config, pretrained=""):
+    def __init__(self, config: dict, pretrained: str = "") -> None:
         model = create_model(config)
         if pretrained:
             print("Load pretrained model from ", pretrained)

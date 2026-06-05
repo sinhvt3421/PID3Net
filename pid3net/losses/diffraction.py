@@ -36,7 +36,7 @@ def negative_log_loss(min_val=1.0):
     return nll
 
 
-def masked_SEloss(y_true, y_pred):
+def masked_SEloss(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
     """Masked squared error on sqrt-intensity, ignoring zero-valued pixels.
 
     Computes ``(sqrt(y_pred) - sqrt(y_true))^2`` only where ``y_true != 0``.

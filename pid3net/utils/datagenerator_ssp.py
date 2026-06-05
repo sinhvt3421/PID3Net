@@ -64,18 +64,18 @@ class DataIteratorSsp(Sequence):
 
     def __init__(
         self,
-        data,
+        data: "np.ndarray",
         batch_size: int = 16,
         n_time: int = 5,
         image_size: int = 256,
-        phase_dir: str = None,
+        phase_dir: "str | None" = None,
         phase_file_pattern: str = "f{time:04d}.npz",
         phase_key: str = "xhat",
         diff_dt_ms: float = 1.0,
         phase_dt_ms: float = 1.0,
         use_prior_amp: bool = False,
-        seed=None,
-    ):
+        seed: "int | None" = None,
+    ) -> None:
         self.use_prior_amp = use_prior_amp
         self.batch_size = batch_size
         self.data = data

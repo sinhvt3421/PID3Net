@@ -48,7 +48,17 @@ class Conv_Down_Temporal_Block(keras.layers.Layer):
         name: Layer name.
     """
 
-    def __init__(self, nfilters, w=3, p=2, padding="same", pool=None, act="swish", name="", **kwargs):
+    def __init__(
+        self,
+        nfilters: int,
+        w: int = 3,
+        p: int = 2,
+        padding: str = "same",
+        pool: object = None,
+        act: str = "swish",
+        name: str = "",
+        **kwargs: object,
+    ) -> None:
         super(Conv_Down_Temporal_Block, self).__init__(name=name, **kwargs)
 
         self.cv = Conv3D(nfilters, (1, 1, 1), padding=padding, activation=act, kernel_regularizer=l2(1e-5))
@@ -65,7 +75,7 @@ class Conv_Down_Temporal_Block(keras.layers.Layer):
         else:
             self.pool = None
 
-    def call(self, x):
+    def call(self, x: tf.Tensor) -> tf.Tensor:
         x = self.cv(x)
         x1 = self.cv_t1(x)
         x2 = self.cv_t2(x)
@@ -93,7 +103,16 @@ class Conv_Up_Temporal_Block(keras.layers.Layer):
         name: Layer name.
     """
 
-    def __init__(self, nfilters, w=3, padding="same", trans=True, act="swish", name="", **kwargs):
+    def __init__(
+        self,
+        nfilters: int,
+        w: int = 3,
+        padding: str = "same",
+        trans: bool = True,
+        act: str = "swish",
+        name: str = "",
+        **kwargs: object,
+    ) -> None:
         super(Conv_Up_Temporal_Block, self).__init__(name=name, **kwargs)
 
         self.cv = Conv3D(nfilters, (1, 1, 1), padding=padding, activation=act, kernel_regularizer=l2(1e-5))
@@ -108,7 +127,7 @@ class Conv_Up_Temporal_Block(keras.layers.Layer):
         else:
             self.tcv = UpSampling3D(size=(1, 2, 2))
 
-    def call(self, x):
+    def call(self, x: tf.Tensor) -> tf.Tensor:
         x = self.cv(x)
         x1 = self.cv_t1(x)
         x2 = self.cv_t2(x)
@@ -134,7 +153,16 @@ class Conv_Down_block(keras.layers.Layer):
         act: Activation function (default ``"swish"``).
     """
 
-    def __init__(self, nfilters, w=3, p=2, padding="same", pool=None, act="swish", **kwargs):
+    def __init__(
+        self,
+        nfilters: int,
+        w: int = 3,
+        p: int = 2,
+        padding: str = "same",
+        pool: object = None,
+        act: str = "swish",
+        **kwargs: object,
+    ) -> None:
         super(Conv_Down_block, self).__init__(**kwargs)
 
         self.cv1 = Conv2D(nfilters, w, padding=padding, activation=act, kernel_regularizer=l2(1e-5))
@@ -147,7 +175,7 @@ class Conv_Down_block(keras.layers.Layer):
         else:
             self.pool = None
 
-    def call(self, x):
+    def call(self, x: tf.Tensor) -> tf.Tensor:
         x = self.cv1(x)
         x = self.cv2(x)
         if self.pool is not None:
@@ -167,14 +195,22 @@ class Conv_Up_block(keras.layers.Layer):
             upsampling here.
     """
 
-    def __init__(self, nfilters, w=3, padding="same", act="swish", trans=True, **kwargs):
+    def __init__(
+        self,
+        nfilters: int,
+        w: int = 3,
+        padding: str = "same",
+        act: str = "swish",
+        trans: bool = True,
+        **kwargs: object,
+    ) -> None:
         super(Conv_Up_block, self).__init__(**kwargs)
 
         self.cv1 = Conv2D(nfilters, w, padding=padding, activation=act, kernel_regularizer=l2(1e-5))
         self.cv2 = Conv2D(nfilters, w, padding=padding, activation=act, kernel_regularizer=l2(1e-5))
         self.tcv = Conv2DTranspose(nfilters, w, strides=2, padding=padding, kernel_regularizer=l2(1e-5))
 
-    def call(self, x):
+    def call(self, x: tf.Tensor) -> tf.Tensor:
         x = self.cv1(x)
         x = self.cv2(x)
         x = self.tcv(x)

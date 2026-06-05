@@ -35,7 +35,17 @@ class TBEncoder(keras.layers.Layer):
         name: Layer name.
     """
 
-    def __init__(self, n_layers=4, filters=8, w=3, k_pool=2, pool="max", activation="swish", name="", **kwargs):
+    def __init__(
+        self,
+        n_layers: int = 4,
+        filters: int = 8,
+        w: int = 3,
+        k_pool: int = 2,
+        pool: str = "max",
+        activation: str = "swish",
+        name: str = "",
+        **kwargs: object,
+    ) -> None:
         super(TBEncoder, self).__init__(name=name, **kwargs)
 
         self.tb_down = [
@@ -49,7 +59,7 @@ class TBEncoder(keras.layers.Layer):
             filters * 2 ** (n_layers - 1), w, act=activation, pool=None, name="latent"
         )
 
-    def call(self, x):
+    def call(self, x: tf.Tensor) -> tf.Tensor:
         for i in range(len(self.tb_down)):
             x = self.tb_down[i](x)
         x = self.latent(x)
@@ -64,7 +74,17 @@ class CNNEncoder(keras.layers.Layer):
     `TBEncoder`.
     """
 
-    def __init__(self, n_layers=4, filters=8, w=3, k_pool=2, pool="max", activation="swish", name="", **kwargs):
+    def __init__(
+        self,
+        n_layers: int = 4,
+        filters: int = 8,
+        w: int = 3,
+        k_pool: int = 2,
+        pool: str = "max",
+        activation: str = "swish",
+        name: str = "",
+        **kwargs: object,
+    ) -> None:
         super(CNNEncoder, self).__init__(name=name, **kwargs)
 
         self.cnn_down = [
@@ -74,7 +94,7 @@ class CNNEncoder(keras.layers.Layer):
 
         self.latent = Conv_Down_block(filters * 2 ** (n_layers - 1), w, act=activation, pool=None, name="latent")
 
-    def call(self, x):
+    def call(self, x: tf.Tensor) -> tf.Tensor:
         for i in range(len(self.cnn_down)):
             x = self.cnn_down[i](x)
         x = self.latent(x)

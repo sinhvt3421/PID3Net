@@ -32,7 +32,15 @@ class TBDecoder(keras.layers.Layer):
         name: Layer name.
     """
 
-    def __init__(self, n_layers=4, filters=8, w=3, activation="swish", name="", **kwargs):
+    def __init__(
+        self,
+        n_layers: int = 4,
+        filters: int = 8,
+        w: int = 3,
+        activation: str = "swish",
+        name: str = "",
+        **kwargs: object,
+    ) -> None:
         super(TBDecoder, self).__init__(name=name, **kwargs)
 
         self.tb_up = [
@@ -43,7 +51,7 @@ class TBDecoder(keras.layers.Layer):
         self.tb_up_last = Conv_Up_Temporal_Block(filters, w, name="decoder_{}".format(n_layers - 1))
         self.out = Conv3D(filters, (1, w, w), padding="same", activation="swish")
 
-    def call(self, x):
+    def call(self, x: tf.Tensor) -> tf.Tensor:
         for i in range(len(self.tb_up)):
             x = self.tb_up[i](x)
         x = self.tb_up_last(x)
@@ -57,7 +65,15 @@ class CNNDecoder(keras.layers.Layer):
     2D counterpart of `TBDecoder`.  Args match.
     """
 
-    def __init__(self, n_layers=4, filters=8, w=3, activation="swish", name="", **kwargs):
+    def __init__(
+        self,
+        n_layers: int = 4,
+        filters: int = 8,
+        w: int = 3,
+        activation: str = "swish",
+        name: str = "",
+        **kwargs: object,
+    ) -> None:
         super(CNNDecoder, self).__init__(name=name, **kwargs)
 
         self.tb_up = [
@@ -68,7 +84,7 @@ class CNNDecoder(keras.layers.Layer):
         self.tb_up_last = Conv_Up_block(filters, w, name="decoder_{}".format(n_layers - 1))
         self.out = Conv2D(filters, w, padding="same", activation="swish")
 
-    def call(self, x):
+    def call(self, x: tf.Tensor) -> tf.Tensor:
         for i in range(len(self.tb_up)):
             x = self.tb_up[i](x)
         x = self.tb_up_last(x)

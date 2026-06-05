@@ -25,7 +25,7 @@ class PriorPhaseFusion(tf.keras.layers.Layer):
         Fused tensor of shape [B, T, H, W].
     """
 
-    def __init__(self, filters: int = 32, kernel_size: int = 3, act: str = "swish", **kwargs):
+    def __init__(self, filters: int = 32, kernel_size: int = 3, act: str = "swish", **kwargs: object) -> None:
         super().__init__(**kwargs)
         k = kernel_size
         self.convs = tf.keras.Sequential(
@@ -36,7 +36,7 @@ class PriorPhaseFusion(tf.keras.layers.Layer):
             ]
         )
 
-    def call(self, x, prior):
+    def call(self, x: tf.Tensor, prior: tf.Tensor) -> tf.Tensor:
         feat = tf.stack([x, prior, x - prior], axis=-1)  # [B, T, H, W, 3]
         w = tf.squeeze(self.convs(feat), axis=-1)  # [B, T, H, W]
         return (1.0 - w) * x + w * prior
@@ -67,17 +67,25 @@ class PriorPhaseLoss(tf.keras.layers.Layer):
         ``x`` unchanged.
     """
 
-    def __init__(self, weight=0.5, **kwargs):
+    def __init__(self, weight: float = 0.5, **kwargs: object) -> None:
         super().__init__(**kwargs)
         self.weight = tf.Variable(weight, trainable=False, dtype="float32", name=f"lambda_{self.name}")
 
-    def call(self, x, prior):
+    def call(self, x: tf.Tensor, prior: tf.Tensor) -> tf.Tensor:
         self.add_loss(self.weight * tf.reduce_mean(tf.square(x - prior)))
         return x
 
 
 class TimeDecayFusion(tf.keras.layers.Layer):
-    def __init__(self, alpha=0.1, filters=8, kernel_size=3, act="swish", mode="exp", **kwargs):
+    def __init__(
+        self,
+        alpha: float = 0.1,
+        filters: int = 8,
+        kernel_size: int = 3,
+        act: str = "swish",
+        mode: str = "exp",
+        **kwargs: object,
+    ) -> None:
         super().__init__(**kwargs)
         self.alpha = tf.Variable(alpha, trainable=True, dtype=tf.float32)
         self.mode = mode
@@ -90,7 +98,7 @@ class TimeDecayFusion(tf.keras.layers.Layer):
         )
         self.act_out = Activation("sigmoid")
 
-    def call(self, ap, init_ap, t):
+    def call(self, ap: tf.Tensor, init_ap: tf.Tensor, t: tf.Tensor) -> tf.Tensor:
         shape = tf.shape(ap)
         init_ap = tf.tile(init_ap, [shape[0], shape[1], 1, 1])
         feat_imag = tf.stack([ap, init_ap, ap - init_ap], axis=-1)

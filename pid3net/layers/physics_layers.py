@@ -15,7 +15,7 @@ from pid3net.layers.activations import Mpi, AmpConstraint
 from pid3net.layers.conv_blocks import Conv_Down_Temporal_Block
 
 
-def combine_complex(amp, phi, mode="polar"):
+def combine_complex(amp: tf.Tensor, phi: tf.Tensor, mode: str = "polar") -> tf.Tensor:
     """Combine amplitude and phase into a complex tensor.
 
     Args:
@@ -33,7 +33,7 @@ def combine_complex(amp, phi, mode="polar"):
 class CombineComplex(tf.keras.layers.Layer):
     """Keras layer wrapping combine_complex for use in functional model graphs."""
 
-    def call(self, amp, phi, mode="polar"):
+    def call(self, amp: tf.Tensor, phi: tf.Tensor, mode: str = "polar") -> tf.Tensor:
         return combine_complex(amp, phi, mode=mode)
 
 
@@ -49,7 +49,7 @@ class TV(tf.keras.layers.Layer):
         train: Whether gamma is trainable.
     """
 
-    def __init__(self, gama, name="TV", train=False, **kwargs):
+    def __init__(self, gama: float, name: str = "TV", train: bool = False, **kwargs: object) -> None:
         super(TV, self).__init__(name=name, **kwargs)
         self.gama = tf.Variable(
             gama,
@@ -58,7 +58,7 @@ class TV(tf.keras.layers.Layer):
             constraint=lambda x: tf.clip_by_value(x, 0.01, 3.0),
         )
 
-    def call(self, inputs):
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
         self.add_loss(self.gama * total_var_3d_iso(inputs))
         return inputs
 
@@ -77,7 +77,16 @@ class CNNTBLayer(tf.keras.layers.Layer):
         out: Output activation: 'sigmoid', 'mpi', 'const', or '' (linear).
     """
 
-    def __init__(self, nfilters=32, w=3, dept=1, act="swish", out="sigmoid", name="", **kwargs):
+    def __init__(
+        self,
+        nfilters: int = 32,
+        w: int = 3,
+        dept: int = 1,
+        act: str = "swish",
+        out: str = "sigmoid",
+        name: str = "",
+        **kwargs: object,
+    ) -> None:
         super(CNNTBLayer, self).__init__(name=name, **kwargs)
         self.cv = [Conv_Down_Temporal_Block(nfilters, w, padding="same", act=act, pool=False) for i in range(dept)]
         self.cv_out = Conv3D(1, (1, w, w), padding="same", activation=None)
@@ -91,7 +100,7 @@ class CNNTBLayer(tf.keras.layers.Layer):
         else:
             self.act_out = Activation("linear")
 
-    def call(self, inputs):
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
         if len(tf.shape(inputs)) == 4:
             x = tf.expand_dims(inputs, -1)
         else:
@@ -101,7 +110,13 @@ class CNNTBLayer(tf.keras.layers.Layer):
         return tf.squeeze(self.act_out(self.cv_out(x)), -1)
 
 
-def ptychography_forward(objects, probe, probe_size, probe_mode="single", refractive=True):
+def ptychography_forward(
+    objects: tf.Tensor,
+    probe: tf.Tensor,
+    probe_size: int,
+    probe_mode: str = "single",
+    refractive: bool = True,
+) -> tf.Tensor:
     """Compute diffraction amplitude from a complex object (forward pass only, no refinement).
 
     Mirrors ``RefineLayer.compute_output_intensity`` so the forward model can be
@@ -169,14 +184,14 @@ class RefineLayer(tf.keras.layers.Layer):
 
     def __init__(
         self,
-        mask,
-        n_step=5,
-        probe_mode="multi_c",
-        refractive=False,
-        update_method="pie",
-        refine_cfg=None,
-        **kwargs,
-    ):
+        mask: object,
+        n_step: int = 5,
+        probe_mode: str = "multi_c",
+        refractive: bool = False,
+        update_method: str = "pie",
+        refine_cfg: object = None,
+        **kwargs: object,
+    ) -> None:
         super(RefineLayer, self).__init__(**kwargs)
         self.mask = mask
 
@@ -198,7 +213,13 @@ class RefineLayer(tf.keras.layers.Layer):
 
         self.use_poisson_projection = bool(poiss_cfg.get("enabled", False))
 
-    def call(self, objects, org_intensity, probe, fftconst):
+    def call(
+        self,
+        objects: tf.Tensor,
+        org_intensity: tf.Tensor,
+        probe: tf.Tensor,
+        fftconst: int,
+    ) -> "tuple[tf.Tensor, tf.Tensor]":
         """Run n_step refinement iterations and return final diffraction amplitude.
 
         Args:
@@ -227,14 +248,14 @@ class RefineLayer(tf.keras.layers.Layer):
 
         return intensity, objects
 
-    def compute_probe_normalization(self, probe):
+    def compute_probe_normalization(self, probe: tf.Tensor) -> tf.Tensor:
         """Compute max probe intensity for normalizing the object update step."""
         if "single" in self.probe_mode:
             return tf.cast(tf.reduce_max(tf.abs(probe) ** 2.0), "complex64")
         else:
             return tf.cast(tf.reduce_sum(tf.reduce_max(tf.abs(probe) ** 2, axis=(-2, -1)), 0), "complex64")
 
-    def compute_exit_wave(self, objects, probe):
+    def compute_exit_wave(self, objects: tf.Tensor, probe: tf.Tensor) -> tf.Tensor:
         """Multiply probe by object transmittance to get the exit wave."""
         if "single" in self.probe_mode:
             return probe * tf.exp(1j * objects) if self.refractive else probe * objects
@@ -245,11 +266,13 @@ class RefineLayer(tf.keras.layers.Layer):
                 else probe * tf.expand_dims(objects, 1)
             )
 
-    def forward_fft(self, pre_exit, fftconst):
+    def forward_fft(self, pre_exit: tf.Tensor, fftconst: int) -> tf.Tensor:
         """Propagate exit wave to far-field via shifted FFT."""
         return fftshift(fft2d(pre_exit), axes=(-2, -1)) / fftconst
 
-    def apply_intensity_constraint(self, dif, org_intensity, pre_exit):
+    def apply_intensity_constraint(
+        self, dif: tf.Tensor, org_intensity: tf.Tensor, pre_exit: tf.Tensor
+    ) -> tf.Tensor:
         """Project predicted far-field amplitude onto the measurement.
 
         Exactly one of two projection rules is applied to ``dif``:
@@ -304,7 +327,9 @@ class RefineLayer(tf.keras.layers.Layer):
         corr = tf.expand_dims(tf.cast(org_intensity / intensity, "complex64"), 1)
         return corr * dif
 
-    def _poisson_projection(self, dif, org_intensity, noise_floor=1.0):
+    def _poisson_projection(
+        self, dif: tf.Tensor, org_intensity: tf.Tensor, noise_floor: float = 1.0
+    ) -> tf.Tensor:
         """One gradient step of the Poisson log-likelihood.
 
         For Poisson observations with mean ``lambda(q) = |Psi(q)|^2``, the
@@ -354,11 +379,18 @@ class RefineLayer(tf.keras.layers.Layer):
         corr_c = tf.expand_dims(tf.cast(eta * corr, "complex64"), 1)
         return dif - dif * corr_c
 
-    def inverse_fft(self, dif, fftconst):
+    def inverse_fft(self, dif: tf.Tensor, fftconst: int) -> tf.Tensor:
         """Propagate constrained far-field back to real space via inverse FFT."""
         return ifft2d(ifftshift(dif, axes=(-2, -1))) * fftconst
 
-    def compute_gradient(self, dexit, pre_exit, probe, prob_tf_abs, reduce_modes=False):
+    def compute_gradient(
+        self,
+        dexit: tf.Tensor,
+        pre_exit: tf.Tensor,
+        probe: tf.Tensor,
+        prob_tf_abs: tf.Tensor,
+        reduce_modes: bool = False,
+    ) -> tf.Tensor:
         """Compute the object update gradient, aware of polar vs refractive mode.
 
         In refractive mode the exit wave is probe*exp(j*object), so d(exit)/d(object) = j*exit.
@@ -392,7 +424,7 @@ class RefineLayer(tf.keras.layers.Layer):
                 return tf.reduce_sum(tf.math.conj(probe) * dexit, 1) / prob_tf_abs
             return tf.math.conj(probe) * dexit / prob_tf_abs
 
-    def decompose_gradient(self, invert_update):
+    def decompose_gradient(self, invert_update: tf.Tensor) -> "tuple[tf.Tensor, tf.Tensor]":
         """Split complex gradient into amplitude and phase components.
 
         Refractive mode uses real/imag decomposition; polar uses abs/angle.
@@ -402,7 +434,15 @@ class RefineLayer(tf.keras.layers.Layer):
         else:
             return tf.math.abs(invert_update), tf.math.angle(invert_update)
 
-    def _apply_object_update(self, objects, dexit, pre_exit, probe, prob_tf_abs, iter=0):
+    def _apply_object_update(
+        self,
+        objects: tf.Tensor,
+        dexit: tf.Tensor,
+        pre_exit: tf.Tensor,
+        probe: tf.Tensor,
+        prob_tf_abs: tf.Tensor,
+        iter: int = 0,
+    ) -> tf.Tensor:
         """Compute gradient from exit wave difference and apply object update.
 
         Handles all two probe modes (single_c, multi_c) including optional CNN corrections.
@@ -427,12 +467,20 @@ class RefineLayer(tf.keras.layers.Layer):
         update = combine_complex(update_a, update_p, mode=mode)
         return tf.cast(self.alpha[iter], "complex64") * update + objects
 
-    def update_object(self, objects, exitw, pre_exit, probe, prob_tf_abs, iter=0):
+    def update_object(
+        self,
+        objects: tf.Tensor,
+        exitw: tf.Tensor,
+        pre_exit: tf.Tensor,
+        probe: tf.Tensor,
+        prob_tf_abs: tf.Tensor,
+        iter: int = 0,
+    ) -> tf.Tensor:
         """PIE update: object correction from direct exit wave difference."""
         dexit = exitw - pre_exit
         return self._apply_object_update(objects, dexit, pre_exit, probe, prob_tf_abs, iter=iter)
 
-    def compute_output_intensity(self, objects, probe, fftconst):
+    def compute_output_intensity(self, objects: tf.Tensor, probe: tf.Tensor, fftconst: int) -> tf.Tensor:
         """Compute final diffraction amplitude from the refined object.
 
         Delegates to the module-level `ptychography_forward` function so

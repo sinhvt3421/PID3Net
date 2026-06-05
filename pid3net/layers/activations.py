@@ -37,7 +37,7 @@ class AmpConstraint(tf.keras.layers.Layer):
         ``layer(x) -> tf.clip_by_value(x, -0.5, 5.0)``
     """
 
-    def call(self, inputs):
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
         return tf.clip_by_value(inputs, -0.5, 5.0)
 
 
@@ -59,13 +59,13 @@ class PhaseConstraint(tf.keras.layers.Layer):
         alpha (scalar, init 3.0, clipped to ``[-10, 10]``).
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: object) -> None:
         super(PhaseConstraint, self).__init__(**kwargs)
         self.alpha = tf.Variable(
             3.0, name="alpha_act", trainable=True, constraint=lambda x: tf.clip_by_value(x, -10, 10)
         )
 
-    def call(self, inputs):
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
         return tf.math.tanh(inputs) * self.alpha
 
 
@@ -83,11 +83,11 @@ class Mpi(tf.keras.layers.Layer):
         alpha (scalar, init 0.5, clipped to ``[-π, π]``).
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: object) -> None:
         super(Mpi, self).__init__(**kwargs)
         self.alpha = tf.Variable(
             0.5, name="alpha_act", trainable=True, constraint=lambda x: tf.clip_by_value(x, -math.pi, math.pi)
         )
 
-    def call(self, inputs):
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
         return tf.math.tanh(inputs) * self.alpha

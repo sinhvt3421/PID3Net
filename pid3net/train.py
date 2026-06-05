@@ -178,7 +178,7 @@ def build_parser():
     return parser
 
 
-def main(argv=None):
+def main(argv: "list[str] | None" = None) -> None:
     """Console-script entry point.
 
     Args:

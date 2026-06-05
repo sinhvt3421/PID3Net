@@ -18,7 +18,7 @@ All loaders expect ``train_data`` to be an ``.npz`` file whose first array
 import numpy as np
 
 
-def load_aunp_data(cfg):
+def load_aunp_data(cfg: dict) -> "np.ndarray":
     """Load AuNP diffraction data with off-centre crop to ``img_size``.
 
     Reads ``train_data`` ``[N, H, W]``, takes the first 1000 frames, crops
@@ -37,7 +37,7 @@ def load_aunp_data(cfg):
     return np.sqrt(data)
 
 
-def load_chart_data(cfg):
+def load_chart_data(cfg: dict) -> "np.ndarray":
     """Load moving-chart diffraction data with a 1-pixel roll along axis 2.
 
     The roll corrects for a known half-pixel offset in the simulated chart
@@ -54,7 +54,7 @@ def load_chart_data(cfg):
     return np.sqrt(data)
 
 
-def load_simu_data(cfg):
+def load_simu_data(cfg: dict) -> "np.ndarray":
     """Load simulated diffraction data without preprocessing.
 
     Args:
@@ -67,7 +67,7 @@ def load_simu_data(cfg):
     return np.sqrt(obs)
 
 
-def load_mg_data(cfg):
+def load_mg_data(cfg: dict) -> "np.ndarray":
     """Load Mg-alloy diffraction data with negative-clip, roll, and centre crop.
 
     Pipeline: clip negative values to 0 → roll axis 2 by 1 pixel → centre-crop

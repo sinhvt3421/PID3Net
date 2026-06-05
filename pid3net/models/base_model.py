@@ -143,7 +143,7 @@ class PtyBase:
 
     is_temporal: bool = True
 
-    def __init__(self, config, model, pretrained=""):
+    def __init__(self, config: dict, model: tf.keras.Model, pretrained: str = "") -> None:
         self.config = config
         self.model = model
 
@@ -175,7 +175,7 @@ class PtyBase:
             phase_dt_ms=cfgh.get("phase_dt_ms", 1.0),
         )
 
-    def create_callbacks(self, epochs=1):
+    def create_callbacks(self, epochs: int = 1) -> list:
         """Create training callbacks: checkpoint, LR tracker, reconstruction monitor.
 
         Args:
@@ -218,7 +218,7 @@ class PtyBase:
             return negative_log_loss(self.config["hyper"]["loss"])
         return masked_SEloss
 
-    def train(self, epochs):
+    def train(self, epochs: int) -> "tf.keras.callbacks.History":
         """Run the training loop.
 
         Compiles the model with Adam optimizer and cosine decay LR schedule.
@@ -265,7 +265,7 @@ class PtyBase:
         )
         return self.hist
 
-    def get_padding_info(self):
+    def get_padding_info(self) -> "tuple[int, object]":
         """Compute padding dimensions when img_size > data spatial size.
 
         Returns:
@@ -372,7 +372,7 @@ class PtyBase:
         model = self.config["model"]["model"]
         np.savez_compressed(f"{save_path}/object_reconstruction_{model}.npz", [all_predict_a, all_predict_p])
 
-    def inference_o(self, overlap=4):
+    def inference_o(self, overlap: int = 4) -> None:
         """Run inference with overlapping temporal windows for smoother temporal transitions.
 
         Loads the best checkpoint and processes the dataset with sliding windows
