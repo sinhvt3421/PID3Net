@@ -9,15 +9,15 @@ model:
   img_size: 384
 hyper:
   batch_size: 2
-  loss: 4.0
+  loss: 1.0
   masking: "../../processed_data/PR/Probe/mask_probe_384_AuNP.npy"
   probe: "../../processed_data/PR/Probe/probe_function_384_AuNP.npy"
   probe_mode: "multi_c"
   n_refine: 5
   n_time: 5
-  sample: "aunp"
-  dist: True
+  sample: "simu"
+  dist: False
   lr: 0.001
   probe_norm: 1.0
-  save_path: "trained_models/public/AuNP_exp_1s_384"
-  train_data: "../../processed_data/PR/AuNp_expdata/frameimg_exposure_1s.npz"
+  save_path: "trained_models/public/Diff_1000ms_data"
+  train_data: "../../processed_data/PR/Diff_realsimu_1000ms_384_1k_2000nm/frameimg_exposure_1000ms_1k_simu.npz"

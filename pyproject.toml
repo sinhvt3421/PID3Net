@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pid3net"
+dynamic = ["version"]
+description = "PID3Net — Physics-Informed Deep learning Network for Dynamic Diffraction imaging"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Vu Tien-Sinh", email = "sinh.vt@jaist.ac.jp" },
+]
+keywords = [
+    "materials science",
+    "ptychography",
+    "X-ray",
+    "deep learning",
+    "physics-informed",
+    "phase retrieval",
+    "dynamic diffraction imaging",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "tensorflow-probability>=0.18",
+    "numpy",
+    "scikit-learn>=1.2.1",
+    "h5py",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.26",
+    "pymdown-extensions>=10",
+    "mkdocs-include-markdown-plugin>=6",
+]
+
+[project.urls]
+Homepage = "https://github.com/sinhvt3421/pid3net"
+Source = "https://github.com/sinhvt3421/pid3net"
+Documentation = "https://sinhvt3421.github.io/pid3net/"
+Changelog = "https://sinhvt3421.github.io/pid3net/changelog/"
+
+[project.scripts]
+pid3net-train = "pid3net.train:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "pid3net.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["pid3net*"]
+exclude = ["configs*", "resources*", "docs*", "trained_models*", "tests*"]

@@ -1,0 +1,96 @@
+# ============================================================================
+#  PID3Net_v4 — config template
+# ----------------------------------------------------------------------------
+#  Copy this file to e.g. `configs/my_experiment.yaml`, fill in the marked
+#  paths, and run:
+#
+#      python train_ssp.py configs/my_experiment.yaml \
+#          --data-root /absolute/path/to/your/data
+#
+#  Any value can also be overridden from the CLI without editing this file:
+#
+#      python train_ssp.py configs/my_experiment.yaml \
+#          --param hyper.lr=0.0005 --param hyper.lambda_prior=2.0
+#
+#  All file paths support the `${DATA_ROOT}` placeholder, resolved against
+#  `--data-root` or the `DATA_ROOT` environment variable.
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+#  Model architecture
+# ----------------------------------------------------------------------------
+model:
+  # `model` is set by the --model CLI flag (3d3 for PID3Net, 2d for the
+  # PIBaseD3Net ablation).  Listed here only for clarity; CLI takes precedence.
+  model: "3d3"
+  filters: 8 # base channel count in conv blocks
+  kernel: 3 # spatial kernel size for conv blocks
+  k_pool: 2 # pool kernel for the encoder downsampling
+  pool: "max" # "max" or "avg"
+  n_cov: 4 # number of encoder conv blocks
+  n_dcov: 4 # number of decoder conv blocks
+  act: "swish" # activation in encoder/decoder blocks
+  img_size: 512 # spatial size of input/output (padded to this)
+
+# ----------------------------------------------------------------------------
+#  Training hyperparameters and data
+# ----------------------------------------------------------------------------
+hyper:
+  # ---- core training ----
+  batch_size: 2
+  lr: 0.001
+  loss: 1.0 # min-intensity threshold for Poisson NLL masking
+  dist: false # CLI: --dist enables Poisson NLL; false → MSE
+  n_time: 5 # temporal window per sample (ignored for 2D models)
+
+  # ---- refinement ----
+  n_refine: 5 # CLI: --n_refine; number of iterative refinement steps
+  rec_mode: "refractive" # CLI: --rec_mode; "polar" or "refractive"
+  update_method: "pie" # CLI: --update_method; "pie" (ePIE) or "raar"
+  tvo: false # true → TV on full complex object; false → TV on amp/phase separately
+
+  # ---- physics: probe, mask, exposure  (REQUIRED — set this!) ----
+  # Probe function file: .npy of complex64 with shape [H, W] (single-mode) or
+  # [M, H, W] (multi-mode).  `probe_mode` selects how it's interpreted.
+  probe: "${DATA_ROOT}/probe.npy"
+  probe_mode: "multi_c" # CLI: --probe_mode; one of: single_c, multi_c
+  probe_norm: 1.0 # amplitude scaling factor (often the exposure-time ratio, default probe norm to 1 second exposure time)
+  masking: false # false to disable, or path to a binary float mask .npy [H, W]
+
+  # ---- dataset (REQUIRED — set this!) ----
+  # built-in: "chart", "aunp", "mgall", "simu"
+  sample: "chart" # which loader in pid3net.utils.general.dataset_functions to use
+  train_data: "${DATA_ROOT}/frame_diff.npz" # measured diffraction stack
+
+  # ---- optional: initialise from ptychography ----
+  # Set to false to disable.  When set, must be a .npy storing
+  # [amplitude_init, phase_init], each [H, W] float32.
+  init_pty: false
+
+  # ---- optional: high-exposure phase prior (ODE-interpolated) ----
+  use_prior_phase: false # true to enable the pre-refinement fusion + annealing loss
+  use_prior_amp: false # true to also include amplitude prior (weak absorption: usually keep false)
+  phase_dir: null # directory of per-step prior files; null disables
+  phase_file_pattern: "f{time:04d}.npy"
+  phase_key: "xhat"
+  diff_dt_ms: 1.0 # diffraction frame interval in ms
+  phase_dt_ms: 1.0 # phase prior frame interval in ms
+  lambda_prior: 10.0 # initial prior-loss weight (cosine-annealed)
+  lambda_prior_min: 1.0 # final prior-loss weight
+
+  # ---- optional: Poisson-MLE modulus projection (refine.*) ----------------
+  # The default modulus projection in RefineLayer hard-replaces predicted
+  # amplitude with sqrt(I_meas).  That is the MLE projection only for
+  # noiseless data; for low-count Poisson pixels it is biased and the bias
+  # propagates into every refinement step.  Enable the option below to
+  # REPLACE the hard projection with one gradient step of the Poisson
+  # log-likelihood per refinement iteration:
+  #   Psi <- Psi - eta * Psi * (1 - I_meas / (|Psi|^2 + eps))
+  # Defaults to OFF -> bit-identical to the classical projection.
+  refine:
+    poisson_projection:
+      enabled: false
+      eps: 1.0e-3           # Tikhonov inside I_meas / (|Psi|^2 + eps)
+
+  # ---- output ----
+  save_path: "trained_models/my_experiment" # output directory (suffix auto-appended)
