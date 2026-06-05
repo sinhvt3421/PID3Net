@@ -49,7 +49,7 @@ class PriorPhaseLoss(tf.keras.layers.Layer):
     ``add_loss()``.  The input tensor ``x`` is returned unchanged (pass-through).
 
     The ``weight`` variable is **not** trainable — it is updated externally by
-    the :class:`~pid3net.models.base_model.PriorLossDecay` callback which
+    the `PriorLossDecay` callback which
     cosine-anneals from a high initial value (trust prior early) to a low final
     value (trust network later).
 

@@ -2,7 +2,7 @@
 # The package metadata lives in pyproject.toml (single source of truth);
 # this file pins specific versions known to work end-to-end.
 
-tensorflow==2.18.0
+tensorflow==2.10.0
 tensorflow-probability==0.18.0
 scikit-learn>=1.2.1
 numpy

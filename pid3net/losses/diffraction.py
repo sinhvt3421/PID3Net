@@ -1,9 +1,9 @@
 """Output-space training losses for the diffraction prediction head.
 
 Two flavours:
-- :func:`negative_log_loss` — Poisson NLL on
+- `negative_log_loss` — Poisson NLL on
     the predicted intensity distribution (used with ``--dist``).
-- :func:`masked_SEloss` — masked squared error on sqrt-intensity (default).
+- `masked_SEloss` — masked squared error on sqrt-intensity (default).
 
 All losses ignore very-low-intensity pixels (below ``min_val``), which on
 Poisson data are dominated by quantisation/photon noise and would otherwise
@@ -21,7 +21,7 @@ def log10(x):
 def negative_log_loss(min_val=1.0):
     """Poisson NLL with a hard reliability mask on pixels above ``min_val``.
 
-    Differs from :func:`negative_log_loss_t` by summing only over reliable
+    Differs from `negative_log_loss_t` by summing only over reliable
     pixels (mask × log-prob) and reducing over the spatial axes explicitly.
     """
 

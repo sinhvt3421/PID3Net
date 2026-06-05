@@ -1,6 +1,6 @@
 """Model classes and the central model registry.
 
-Use :data:`MODEL_REGISTRY` (or :func:`register_model`) to discover or add
+Use `MODEL_REGISTRY` (or `register_model`) to discover or add
 model variants without editing ``train_ssp.py`` or ``base_model.py``.
 """
 
