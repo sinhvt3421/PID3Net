@@ -5,7 +5,6 @@ from pid3net.layers import *
 from tensorflow.keras.callbacks import *
 
 from pid3net.models import PtyBase
-from pid3net.losses import total_var_3d, total_var
 from pid3net.layers import CNNEncoder, CNNDecoder
 
 import numpy as np
@@ -16,6 +15,10 @@ tfd = tfp.distributions
 
 
 class PIBaseD3Net(PtyBase):
+    """2D baseline model (no temporal axis)."""
+
+    is_temporal = False
+
     def __init__(self, config, pretrained=""):
         model = create_model(config)
         if pretrained:

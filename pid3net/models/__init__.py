@@ -1,8 +1,20 @@
+"""Model classes and the central model registry.
+
+Use :data:`MODEL_REGISTRY` (or :func:`register_model`) to discover or add
+model variants without editing ``train_ssp.py`` or ``base_model.py``.
+"""
+
 from pid3net.models.base_model import PtyBase
-from pid3net.models.PID3Net import PID3Net
 from pid3net.models.baseline import PIBaseD3Net
-from pid3net.models.AutophaseNN import AutoPhaseNN
-from pid3net.models.PtychoNN import PtychoNN
+from pid3net.models.pid3net import PID3Net
+from pid3net.models.registry import MODEL_REGISTRY, ModelSpec, get_spec, register_model
 
-
-__all__ = ["PtyBase", "PID3Net", "PIBaseD3Net", "AutoPhaseNN", "PtychoNN"]
+__all__ = [
+    "PtyBase",
+    "PIBaseD3Net",
+    "PID3Net",
+    "MODEL_REGISTRY",
+    "ModelSpec",
+    "get_spec",
+    "register_model",
+]

@@ -11,7 +11,6 @@
 * [Installation](#installation)
 * [Usage](#usage)
 * [Configuration Reference](#configuration-reference)
-* [Project Structure](#project-structure)
 * [Output Files](#output-files)
 * [Datasets](#datasets)
 * [References](#references)
@@ -72,12 +71,31 @@ Tensorflow can  also be installed from ```conda``` for simplification settings:
 conda install -c conda-forge tensorflow-gpu
 ```
 
-#### Method 1 (directly install from git)
-You can install the lastes development version of PID3Net from this repo and install using:
-```
+#### Method 1 — from a source checkout
+
+Clone the repo and install in editable mode:
+
+```bash
 git clone https://github.com/sinhvt3421/PID3Net
 cd PID3Net
 python -m pip install -e .
+```
+
+#### Method 2 — wheel build
+
+```bash
+python -m pip install build
+python -m build
+python -m pip install dist/pid3net-*.whl
+```
+
+#### Using PID3Net as a library
+
+After installation the package is importable from any Python project:
+
+```python
+from pid3net.models import PID3Net, MODEL_REGISTRY, get_spec
+from pid3net.layers.physics_layers import RefineLayer
 ```
 
 <a name="usage"></a>
@@ -86,30 +104,40 @@ python -m pip install -e .
 
 ## Quick Start
 
-Train the default PID3NetV3 model on Mg alloy refractive data:
+Train the default PID3Net model on the bundled moving-chart data using the
+installed console script:
 
 ```bash
-python train_ssp.py configs/MgAlloy_refractive.yaml
+pid3net-train configs/Moving_chart_1ms.yaml
+```
+
+Equivalently, via Python (also works from a source checkout without install):
+
+```bash
+python -m pid3net.train configs/Moving_chart_1ms.yaml
+python train_ssp.py        configs/Moving_chart_1ms.yaml   # legacy shim
 ```
 
 Run inference only (skip training, use existing weights):
 
 ```bash
-python train_ssp.py configs/MgAlloy_refractive.yaml --inference-only
+pid3net-train configs/Moving_chart_1ms.yaml --inference-only
 ```
 
 ## CLI Reference
 
 ```
-python train_ssp.py <dataset_config> [options]
+pid3net-train <dataset_config> [options]
 ```
 
 | Argument | Type | Default | Description |
 |---|---|---|---|
 | `dataset` | str | *required* | Path to dataset YAML config file |
-| `--mode` | str | `3d3` | Model architecture: `3d3`, `2d`, `autonn`, `ptychonn` |
+| `--model` | str | `3d3` | Model architecture: `3d3` (PID3Net, default) or `2d` (PIBaseD3Net ablation) |
 | `--n_refine` | int | `5` | Number of iterative refinement steps in the refinement block |
-| `--probe_mode` | str | `multi_c` | Probe function mode: `single`, `single_c`, `multi`, `multi_c` |
+| `--probe_mode` | str | `multi_c` | Probe function mode: `single_c`, `multi_c` |
+| `--rec_mode` | str | `refractive` | Reconstruction mode: `polar` or `refractive` |
+| `--update_method` | str | `pie` | Refinement rule: `pie` (ePIE) or `raar` |
 | `--pretrained` | str | `""` | Path to pretrained model weights (.tf checkpoint) |
 | `--dist` | flag | `False` | Use Poisson distribution output (default: MSE loss) |
 | `--epoch` | int | `20` | Number of training epochs |
@@ -118,36 +146,20 @@ python train_ssp.py <dataset_config> [options]
 
 ## Model Modes
 
-### `3d3` — PID3NetV3 (default, recommended)
+### `3d3` — PID3Net (default, recommended)
 
 The main 3D temporal model with encoder-decoder backbone, physics-informed refinement block, and optional time-decay fusion for initialization. Supports refractive index mode.
 
 ```bash
-python train_ssp.py configs/MgAlloy_refractive.yaml --mode 3d3
+pid3net-train configs/Moving_chart_1ms.yaml --model 3d3
 ```
 
-### `2d` — PIBaseD3Net (2D baseline)
+### `2d` — PIBaseD3Net (2D ablation)
 
-A 2D spatial baseline using Conv2D encoder-decoder. Processes single diffraction patterns without temporal context.
-
-```bash
-python train_ssp.py configs/MgAlloy_refractive.yaml --mode 2d
-```
-
-### `autonn` — AutoPhaseNN (3D baseline)
-
-A 3D baseline adapted from [AutoPhaseNN](https://github.com/YudongYao/AutoPhaseNN) with custom encoder-decoder and forward FFT propagation.
+A 2D spatial ablation of PID3Net using Conv2D encoder-decoder. Processes single diffraction patterns without temporal context — useful for measuring the contribution of the temporal axis.
 
 ```bash
-python train_ssp.py configs/AuNP_1s_data.yaml --mode autonn
-```
-
-### `ptychonn` — PtychoNN (2D baseline)
-
-A 2D baseline adapted from [PtychoNN](https://github.com/mcherukara/PtychoNN) with Conv2D encoder-decoder.
-
-```bash
-python train_ssp.py configs/AuNP_1s_data.yaml --mode ptychonn
+pid3net-train configs/Moving_chart_1ms.yaml --model 2d
 ```
 
 ## Probe Modes
@@ -156,23 +168,15 @@ The probe mode controls how the illumination probe function is handled during it
 
 | Mode | Probe Type | Update Method | Description |
 |---|---|---|---|
-| `single` | Single probe | Gradient | One probe function, analytic gradient update |
 | `single_c` | Single probe | CNN | One probe function, CNN-learned update |
-| `multi` | Multi-mode | Gradient | Multiple probe modes, analytic gradient update |
 | `multi_c` | Multi-mode | CNN | Multiple probe modes, CNN-learned update (default) |
 
 ```bash
-# Single probe with analytic update
-python train_ssp.py configs/MgAlloy_refractive.yaml --probe_mode single
-
 # Single probe with CNN-learned update
-python train_ssp.py configs/MgAlloy_refractive.yaml --probe_mode single_c
-
-# Multi-mode probe with analytic update
-python train_ssp.py configs/MgAlloy_refractive.yaml --probe_mode multi
+python train_ssp.py configs/Moving_chart_1ms.yaml --probe_mode single_c
 
 # Multi-mode probe with CNN-learned update (default)
-python train_ssp.py configs/MgAlloy_refractive.yaml --probe_mode multi_c
+python train_ssp.py configs/Moving_chart_1ms.yaml --probe_mode multi_c
 ```
 
 ## Training Options
@@ -183,10 +187,10 @@ By default, the model uses masked squared error (MSE) loss. Use Poisson negative
 
 ```bash
 # MSE loss (default)
-python train_ssp.py configs/MgAlloy_refractive.yaml
+python train_ssp.py configs/Moving_chart_1ms.yaml
 
 # Poisson loss
-python train_ssp.py configs/MgAlloy_refractive.yaml --dist
+python train_ssp.py configs/Moving_chart_1ms.yaml --dist
 ```
 
 ### Refinement steps
@@ -195,35 +199,35 @@ Control the number of physics-informed iterative refinement steps:
 
 ```bash
 # Default 5 refinement steps (optimal for current datasets)
-python train_ssp.py configs/MgAlloy_refractive.yaml --n_refine 5
+python train_ssp.py configs/Moving_chart_1ms.yaml --n_refine 5
 
 # More refinement steps may better convergence but slowdown training
-python train_ssp.py configs/MgAlloy_refractive.yaml --n_refine 7
+python train_ssp.py configs/Moving_chart_1ms.yaml --n_refine 7
 
 # No refinement (encoder-decoder only)
-python train_ssp.py configs/MgAlloy_refractive.yaml --n_refine 0
+python train_ssp.py configs/Moving_chart_1ms.yaml --n_refine 0
 ```
 
 ### Resume training from pretrained weights
 
 ```bash
-python train_ssp.py configs/MgAlloy_refractive.yaml \
+python train_ssp.py configs/Moving_chart_1ms.yaml \
     --pretrained trained_models/previous_run/models/model_unsp.tf
 ```
 
 ### Reproducibility
 
 ```bash
-python train_ssp.py configs/MgAlloy_refractive.yaml --seed 0
+python train_ssp.py configs/Moving_chart_1ms.yaml --seed 0
 ```
 
 ## Full Example
 
-Train PID3NetV3 with multi-mode CNN probe, 5 refinement steps, Poisson loss, for 20 epochs:
+Train PID3Net with multi-mode CNN probe, 5 refinement steps, Poisson loss, for 20 epochs:
 
 ```bash
-python train_ssp.py configs/MgAlloy_refractive.yaml \
-    --mode 3d3 \
+pid3net-train configs/Moving_chart_1ms.yaml \
+    --model 3d3 \
     --probe_mode multi_c \
     --n_refine 5 \
     --dist \
@@ -258,7 +262,7 @@ hyper:
   n_refine: 5         # Refinement block iterations
   dist: false         # Use Poisson distribution output
   tvo: false          # TV regularization mode (false=on amp/phase, true=on object)
-  sample: "mgall"     # Dataset loader key: "mgall", "aunp", "chart", "simu"
+  sample: "chart"     # Dataset loader key: "chart", "aunp", "mgall", "simu"
   save_path: "trained_models/experiment_name"
 
   # File paths
@@ -269,71 +273,92 @@ hyper:
   masking: "/path/to/mask.npy"          # Spatial mask file (false to disable)
   init_pty: "/path/to/ptycho_init.npy"  # Initial reconstruction from pytchography (false to disable)
 ```
-<!-- 
-## Model Section
 
-| Key | Type | Description |
-|---|---|---|
-| `filters` | int | Base number of convolutional filters. Each encoder level doubles this. |
-| `kernel` | int | Spatial kernel size for convolutions. |
-| `k_pool` | int | Pooling kernel size for downsampling. |
-| `pool` | str | Pooling strategy: `"max"` (MaxPool) or `"stride"` (strided conv). |
-| `n_cov` | int | Number of encoder blocks (downsampling levels). |
-| `n_dcov` | int | Number of decoder blocks (upsampling levels). |
-| `act` | str | Activation function for conv layers (e.g., `"swish"`, `"relu"`). |
-| `img_size` | int | Input image size in pixels. Diffraction patterns are padded to this size. | -->
+## Hyperparameter Section
 
-<!-- ## Hyperparameter Section
+### Core training
 
-| Key | Type | Description |
-|---|---|---|
-| `batch_size` | int | Number of samples per training batch. |
-| `loss` | float | Threshold for Poisson NLL loss (min intensity value). |
-| `lr` | float | Initial learning rate. Uses cosine decay schedule during training. |
-| `n_time` | int | Number of temporal frames per input sequence (3D models only). |
-| `n_refine` | int | Number of physics-informed refinement iterations. |
-| `dist` | bool | If true, use Poisson NLL loss; if false, use masked MSE. |
-| `tvo` | bool | TV regularization mode. `false`: apply TV on amplitude and phase separately. `true`: apply TV on the combined complex object. |
-| `sample` | str | Dataset loader key. Available: `"mgall"`, `"aunp"`, `"chart"`, `"simu"`. |
-| `save_path` | str | Base directory for saving checkpoints and results. |
-| `train_data` | str | Path to training data file (`.npz` format). |
-| `probe` | str | Path to probe function file (`.npy`, complex64 array). |
-| `probe_mode` | str | Probe mode: `"single"`, `"single_c"`, `"multi"`, `"multi_c"`. |
-| `probe_norm` | float/bool | Exposure time normalization factor. Set to `false` to disable. |
-| `masking` | str/bool | Path to spatial mask file (`.npy`). Set to `false` to disable. |
-| `init_pty` | str/bool | Path to initial ptychographic reconstruction (`.npy`). Enables time-decay fusion. Set to `false` to disable. | -->
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `batch_size` | int | — | Number of samples per training batch. |
+| `loss` | float | — | Min-intensity threshold for the Poisson NLL loss mask. |
+| `dist` | bool | false | If true, use Poisson NLL loss; if false, use masked MSE. CLI `--dist`. |
+| `n_time` | int | — | Number of temporal frames per input sequence (3D models only). |
+| `sample` | str | — | Dataset loader key. One of `"mgall"`, `"aunp"`, `"chart"`, `"simu"`. |
+| `save_path` | str | — | Base directory for checkpoints and results (suffix auto-appended). |
 
-<a name="project-structure"></a>
+### Physics (probe / mask / exposure)
 
-# Project Structure
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `train_data` | str | — | Path to diffraction `.npz` (`arr_0` shape `[N, H, W]`). |
+| `probe` | str | — | Path to probe `.npy`. Shape `[H, W]` (single) or `[M, H, W]` (multi). |
+| `probe_mode` | str | `"multi_c"` | One of  `"single_c"`, `"multi_c"`. CLI `--probe_mode`. |
+| `probe_norm` | float / false | false | Exposure-time amplitude scaling (probe is √-scaled by this). |
+| `masking` | str / false | false | Path to spatial mask `.npy` `[H, W]` (binary float), or `false`. |
 
+### Refinement
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `n_refine` | int | 5 | Number of iterative refinement steps. CLI `--n_refine`. |
+| `rec_mode` | str | `"refractive"` | `"polar"` (`amp·exp(jφ)`) or `"refractive"` (`φ + j·amp`). CLI `--rec_mode`. |
+| `update_method` | str | `"pie"` | Refinement rule: `"pie"` (ePIE) or `"raar"` (Relaxed Averaged Alternating Reflections). CLI `--update_method`. |
+
+See `docs/refinement_design.md` for the full derivation and the design log.
+
+### Optional: Initialise from a known ptychographic reconstruction
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `init_pty` | str / false | false | `.npy` storing `[amp_init, phase_init]`, each `[H, W]` float32. Enables `TimeDecayFusion`. |
+
+### Optional: Phase prior (high-exposure → low-exposure guidance)
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `use_prior_phase` | bool | false | Enables `PriorPhaseFusion` (pre-refinement) and `PriorPhaseLoss` (annealing MSE). |
+| `use_prior_amp` | bool | false | Also include amplitude prior (often weak; usually leave off). |
+| `phase_dir` | str / null | null | Directory of per-step prior files. |
+| `phase_file_pattern` | str | `"f{time:04d}.npy"` | Filename template (uses `{time}`). |
+| `diff_dt_ms` | float | 1.0 | Diffraction frame interval in ms. |
+| `phase_dt_ms` | float | 1.0 | Phase prior frame interval in ms. |
+| `lambda_prior` | float | 10.0 | Initial prior-loss weight (cosine-annealed). |
+| `lambda_prior_min` | float | 1.0 | Final prior-loss weight. |
+
+## Applying the model to a new dataset
+
+A new dataset needs three things: (1) a diffraction stack, (2) a probe function, and (3) a config pointing at them.
+
+**1. Prepare your data files.**
+
+| File | Format | Shape | Dtype |
+|---|---|---|---|
+| diffraction stack | `.npz` with key `"arr_0"` | `[N_frames, H, W]` | float32/64 (intensity) |
+| probe | `.npy` | `[H_p, W_p]` or `[M, H_p, W_p]` | complex64 |
+| mask (optional) | `.npy` | `[H, W]` | float32 (0/1) |
+| init from ptycho (optional) | `.npy` | `[amp_init, phase_init]` each `[H, W]` | float32 |
+
+Place them anywhere; you'll reference them from your config.
+
+**2. Copy the template config.**
+
+```bash
+cp configs/_template.yaml configs/my_experiment.yaml
 ```
-PID3Net_v4/
-├── train_ssp.py                     # Main training and inference script
-├── configs/                         # YAML configuration files per dataset
-│   ├── MgAlloy_refractive.yaml
-│   ├── AuNP_1s_data.yaml
-│   ├── Moving_chart_500ms.yaml
-│   └── ...
-├── pid3net/
-│   ├── losses.py                    # Loss functions (Poisson NLL, masked MSE, total variation)
-│   ├── layers/
-│   │   ├── activations.py           # Trainable activation layers (PhaseConstraint, Mpi)
-│   │   ├── conv_blocks.py           # 2D/3D encoder-decoder building blocks
-│   │   ├── encoders.py              # TBEncoder (3D temporal), CNNEncoder (2D spatial)
-│   │   ├── decoders.py              # TBDecoder (3D temporal), CNNDecoder (2D spatial)
-│   │   ├── physics_layers.py        # RefineLayer, TV regularization, complex arithmetic
-│   │   └── fusion.py                # TimeDecayFusion for initial reconstruction blending
-│   ├── models/
-│   │   ├── base_model.py            # PtyBase: shared training, inference, callbacks
-│   │   ├── PID3Net_v3.py            # PID3NetV3: main model with refractive refinement
-│   │   ├── baseline.py              # PIBaseD3Net: 2D baseline model
-│   │   ├── AutophaseNN.py           # AutoPhaseNN: 3D baseline (adapted from external)
-│   │   └── PtychoNN.py              # PtychoNN: 2D baseline (adapted from external)
-│   └── utils/
-│       ├── general.py               # Dataset loading functions per sample type
-│       └── datagenerator_ssp.py     # Keras Sequence data generator for training
-└── resources/                       # Figures and supplementary files
+
+Edit `configs/my_experiment.yaml`:
+- Set `hyper.sample` to one of the built-in loaders (`"mgall"`, `"aunp"`, `"chart"`, `"simu"`) — pick the one with preprocessing closest to your data. To add a custom loader, append an entry to `pid3net.utils.general.dataset_functions`.
+- Set `hyper.train_data`, `hyper.probe`, and `hyper.masking` paths. Use the `${DATA_ROOT}` placeholder for portability.
+- Adjust `model.img_size` to your diffraction pattern size.
+- Tweak `hyper.n_time` (for 3D models) to match the temporal window you want.
+
+**3. Run training.**
+
+```bash
+python train_ssp.py configs/my_experiment.yaml \
+    --data-root /absolute/path/to/your/data \
+    --epoch 20
 ```
 
 <a name="output-files"></a>

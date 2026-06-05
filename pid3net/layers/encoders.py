@@ -1,12 +1,40 @@
+"""Encoder backbones built from temporal or 2D conv blocks.
+
+- :class:`TBEncoder` — temporal block encoder for 3D models
+  (input ``[B, T, H, W, C]``).
+- :class:`CNNEncoder` — 2D encoder for non-temporal models
+  (input ``[B, H, W, C]``).
+
+Both produce a "latent" feature map at the bottom of the pyramid; spatial
+size is reduced by a factor of ``k_pool ** n_layers`` while channels grow
+geometrically as ``filters * 2**i``.
+"""
+
 import tensorflow as tf
 import tensorflow.keras as keras
 import tensorflow.keras.backend as K
 from tensorflow.keras import regularizers
 
-from pid3net.layers.base_layers import Conv_Down_Temporal_Block, Conv_Down_block
+from pid3net.layers.conv_blocks import Conv_Down_Temporal_Block, Conv_Down_block
 
 
 class TBEncoder(keras.layers.Layer):
+    """Temporal-block encoder for 3D models.
+
+    Stack of ``n_layers`` :class:`Conv_Down_Temporal_Block` layers with growing
+    channel counts (``filters * 2**i``) followed by one non-pooling latent
+    block.
+
+    Args:
+        n_layers: Number of downsampling blocks.
+        filters: Base channel count of the first block.
+        w: Spatial kernel size.
+        k_pool: Spatial pool factor at each downsampling block.
+        pool: ``"max"`` / ``"stride"`` / None (see :class:`Conv_Down_Temporal_Block`).
+        activation: Activation function.
+        name: Layer name.
+    """
+
     def __init__(self, n_layers=4, filters=8, w=3, k_pool=2, pool="max", activation="swish", name="", **kwargs):
         super(TBEncoder, self).__init__(name=name, **kwargs)
 
@@ -29,6 +57,13 @@ class TBEncoder(keras.layers.Layer):
 
 
 class CNNEncoder(keras.layers.Layer):
+    """2D-conv encoder for non-temporal models.
+
+    2D counterpart of :class:`TBEncoder`.  Stacks ``n_layers``
+    :class:`Conv_Down_block` layers + one latent block.  Args match
+    :class:`TBEncoder`.
+    """
+
     def __init__(self, n_layers=4, filters=8, w=3, k_pool=2, pool="max", activation="swish", name="", **kwargs):
         super(CNNEncoder, self).__init__(name=name, **kwargs)
 

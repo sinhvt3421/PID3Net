@@ -10,8 +10,8 @@ model:
 hyper:
   batch_size: 4
   loss: 2.0
-  masking: "../../processed_data/PR/Probe/mask_probe_378.npy"
-  probe: "../../processed_data/PR/Probe/probe_function_378.npy"
+  masking: "/home/share/Mg_Alloys_Ptycho/processed_data/Moving_chart/mask_probe_378.npy"
+  probe: "/home/share/Mg_Alloys_Ptycho/processed_data/Moving_chart/probe_function_378.npy"
   probe_mode: "multi_c"
   n_refine: 5
   n_time: 5
@@ -19,5 +19,6 @@ hyper:
   dist: True
   lr: 0.001
   probe_norm: 0.00727175
-  save_path: "trained_models/public/Moving_chart_15s_7ms"
-  train_data: "../../processed_data/PR/Moving_chart/dataset2_15s_25fr_7ms.npz"
+  save_path: "trained_models/public/Moving_chart_10s_7ms_mask"
+  train_data: "/home/share/Mg_Alloys_Ptycho/processed_data/Moving_chart/dataset2_10s_25fr_7ms.npz"
+  init_pty: ""

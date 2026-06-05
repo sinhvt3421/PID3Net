@@ -1,0 +1,25 @@
+model:
+  filters: 8
+  kernel: 3
+  k_pool: 2
+  pool: "max"
+  n_cov: 4
+  n_dcov: 4
+  act: "swish"
+  img_size: 560
+hyper:
+  batch_size: 2
+  loss: 1.0
+  masking: "../../processed_data/PR/Mg_alloy/mask_probe_560_Mg.npy"
+  probe: "../../processed_data/PR/Mg_alloy/probe_function_560_Mg.npy"
+  probe_mode: "multi_c"
+  n_refine: 5
+  n_time: 5
+  sample: "mgall"
+  dist: True
+  lr: 0.001
+  probe_norm: 10.0
+  save_path: "trained_models/public/MgAlloy_10s_refractive_init_pty"
+  init_pty: "../../processed_data/PR/Mg_alloy/init_pty_560_Mg.npy"
+  # init_pty: ""
+  train_data: "../../processed_data/PR/Mg_alloy/difimg_10s.npz"

@@ -1,0 +1,24 @@
+model:
+  filters: 8
+  kernel: 3
+  k_pool: 2
+  pool: "max"
+  n_cov: 4
+  n_dcov: 4
+  act: "swish"
+  img_size: 512
+hyper:
+  batch_size: 2
+  loss: 1.0
+  masking: "/home/share/Mg_Alloys_Ptycho/processed_data/Mg_alloys/mask_probe_512_3k_ramping.npy"
+  probe: "/home/share/Mg_Alloys_Ptycho/processed_data/Mg_alloys/probs_m4_1s_512_3k_ramping.npy"
+  probe_mode: "multi_c"
+  n_refine: 5
+  n_time: 5
+  sample: "mgall"
+  dist: False
+  lr: 0.001
+  probe_norm: 0.1
+  save_path: "trained_models/dev/MgAlloy_newre_best_100ms_dynamic_time_3k_ramping_iso"
+  init_pty: "/home/share/Mg_Alloys_Ptycho/processed_data/Mg_alloys/ptycho_init_512_3k_ramping.npy"
+  train_data: "/home/share/Mg_Alloys_Ptycho/processed_data/Mg_alloys/frame_ramping_3K_100ms.npz"

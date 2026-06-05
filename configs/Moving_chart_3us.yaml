@@ -1,0 +1,35 @@
+model:
+  filters: 8
+  kernel: 3
+  k_pool: 2
+  pool: "max"
+  n_cov: 4
+  n_dcov: 4
+  act: "swish"
+  img_size: 384
+hyper:
+  batch_size: 4
+  loss: 2.0
+  masking: "/home/share/Mg_Alloys_Ptycho/processed_data/Moving_chart/mask_probe_378.npy"
+  probe: "/home/share/Mg_Alloys_Ptycho/processed_data/Moving_chart/probe_function_378.npy"
+  probe_mode: "multi_c"
+  n_refine: 5
+  n_time: 5
+  sample: "chart"
+  dist: True
+  lr: 0.001
+  probe_norm: 0.00029087
+  save_path: "trained_models/public/Moving_chart_10s_3us_poiss_mask"
+  train_data: "/home/share/Mg_Alloys_Ptycho/processed_data/Moving_chart/dataset2_10s_1fr_0.3s.npz"
+  init_pty: ""
+  phase_dir: "trained_models/public/best_model/Moving_chart_10s_1ms_prior_mask_3d3_poiss_2.0_r5_multi_c_polar_pie_seed0/dupdata/"
+  use_prior_phase: True
+
+  refine:
+    # --- B. Poisson-MLE projection ---
+    # Blends the classical hard modulus replacement (Gaussian MLE) with a
+    # Poisson log-likelihood gradient step.  rho=0 at init = pure hard
+    # projection = current behaviour.  Less biased on low-count pixels.
+    poisson_projection:
+      enabled: False
+      eps: 1.0e-3 # Tikhonov inside I_meas / (|Psi|^2 + eps)
