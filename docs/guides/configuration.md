@@ -41,7 +41,7 @@ edit. This page is the canonical reference.
 |---|---|---|---|
 | `n_refine` | int | `5` | Number of refinement iterations. |
 | `update_method` | str | `"pie"` | `pie` (ePIE) or `raar`. |
-| `refine.poisson_projection.enabled` | bool | `false` | Opt-in: **replace** Gaussian-MLE projection with Poisson-MLE gradient step. See [Refinement](../concepts/refinement.md). |
+| `refine.poisson_projection.enabled` | bool | `false` | Opt-in: **replace** Gaussian-MLE projection with Poisson-MLE gradient step. |
 | `refine.poisson_projection.eps` | float | `1e-3` | Tikhonov inside `I_meas / (\|Ψ\|² + ε)`. |
 
 ## `hyper:` — dataset

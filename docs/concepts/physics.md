@@ -54,8 +54,7 @@ Per iteration:
 1. **Exit wave** $\psi = P \cdot O$ (or $\psi = P \cdot e^{j O}$ refractive).
 2. **Forward FFT** $\Psi = \mathcal{F}\{\psi\}$.
 3. **Modulus projection** $\Psi' = \sqrt{I_\text{meas}} \cdot \Psi/|\Psi|$
-   (Gaussian-MLE; see [Refinement](refinement.md) for the noise-aware
-   alternatives).
+   (Gaussian-MLE; Poisson-MLE).
 4. **Inverse FFT** $\psi' = \mathcal{F}^{-1}\{\Psi'\}$.
 5. **Object update** along the gradient of the data-fit loss:
 

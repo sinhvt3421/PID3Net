@@ -16,7 +16,7 @@ network's outputs stay consistent with the underlying diffraction
 physics rather than relying solely on learned statistical patterns.
 
 [Get started](getting-started/installation.md){ .md-button .md-button--primary }
-[Read the design log](concepts/refinement.md){ .md-button }
+[Read the design log](concepts/architecture.md){ .md-button }
 [API reference](api/index.md){ .md-button }
 
 ---
@@ -51,9 +51,6 @@ physics rather than relying solely on learned statistical patterns.
   iterations of ePIE or RAAR with a learned CNN correction per step,
   in either *polar* (`amp · exp(jφ)`) or *refractive* (`φ + j·amp`)
   reconstruction mode. See [Physics](concepts/physics.md).
-- **Noise-aware modulus projection** — opt-in Poisson-MLE projection,
-  both designed for low-count diffraction data. See
-  [Refinement](concepts/refinement.md).
 - **YAML-driven training** — single config file controls the entire
   pipeline; CLI flags override individual keys. See
   [Configuration](guides/configuration.md).

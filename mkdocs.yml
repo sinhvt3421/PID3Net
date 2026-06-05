@@ -133,7 +133,6 @@ nav:
   - Concepts:
       - Architecture: concepts/architecture.md
       - Physics: concepts/physics.md
-      - Refinement: concepts/refinement.md
       - Losses & regularisers: concepts/losses.md
   - Guides:
       - Training: guides/training.md

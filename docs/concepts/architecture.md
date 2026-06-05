@@ -80,7 +80,6 @@ For each of `n_refine` steps:
 3. **Intensity constraint** – the *modulus projection*. Default:
    hard Gaussian-MLE replacement `Ψ ← sqrt(I_meas) · Ψ/|Ψ|`.
    Optionally Poisson-MLE (opt-in via `refine.poisson_projection`).
-   See [Refinement](refinement.md).
 4. Inverse FFT to get the constrained exit wave `ψ'`.
 5. Object update from `dψ = ψ' − ψ`:
     - **ePIE** (default): `O ← O + α · CNN(decompose(P*·dψ))`.

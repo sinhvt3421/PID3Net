@@ -60,8 +60,7 @@ A typical sweep flow:
 
 1. Confirm reconstruction quality with the defaults.
 2. Try `--update_method raar` if PIE underconverges on low-SNR pixels.
-3. Try `--n_refine 7` or `10` (slower; see the trade-offs in
-   [Refinement](../concepts/refinement.md)).
+3. Try `--n_refine 7` or `10` (slower; trade-offs).
 4. Try `--dist` for Poisson NLL on photon-count diffraction.
 5. If complex regions blur, see the noise-aware projection options
    under `refine.*` in the YAML — they're opt-in and documented in

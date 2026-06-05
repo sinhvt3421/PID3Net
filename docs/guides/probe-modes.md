@@ -48,6 +48,5 @@ don't transfer cleanly across mode dimensionality).
 
 ## See also
 
-- [Physics](../concepts/physics.md) — the math of the forward model.
-- [Refinement](../concepts/refinement.md) — what `dψ` and the CNN
-  nudge actually do.
+- [Physics](../concepts/physics.md) — the math of the forward model what `dψ` and the CNN
+  nudge actually do..

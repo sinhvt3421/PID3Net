@@ -87,5 +87,4 @@ amp, phase = data["amplitude"], data["phase"]   # shape [T, H, W]
 - [Apply to a new dataset](new-dataset.md) — the recipe for your own data.
 - [Architecture](../concepts/architecture.md) — what the model actually
   does between the input diffraction stack and the output object.
-- [Refinement](../concepts/refinement.md) — design notes on the
-  noise-aware modulus projection.
+

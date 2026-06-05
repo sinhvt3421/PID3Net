@@ -53,8 +53,7 @@ pid3net-train configs/Moving_chart_1ms.yaml --n_refine 7
 ```
 
 Doubles refinement loop cost; expect ~10 % wall-clock increase per
-+1 step. Marginal quality gains beyond 5 in our experiments — see
-[Refinement](../concepts/refinement.md).
++1 step. Marginal quality gains beyond 5 in our experiments.
 
 ### Reproducible run
 
